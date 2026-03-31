@@ -6,35 +6,69 @@ import java.util.Stack;
 
 import org.model.interfaces.Drawable;
 
+/**
+ * The DrewPool class manages a collection of drawable objects.
+ * It provides functionality to add, remove, and clear objects, as well as undo and redo capabilities
+ * for managing the history of drawn objects.
+ */
 public class DrewPool {
     private final Stack<Drawable> drewObjects;
     private final Stack<Drawable> temporaryRemovedDrawables;
 
+    /**
+     * Constructs a DrewPool with a pre-existing stack of drawable objects.
+     *
+     * @param objs The initial stack of drawable objects.
+     */
     public DrewPool(Stack<Drawable> objs) {
         this.drewObjects = objs;
         this.temporaryRemovedDrawables = new Stack<>();
     }
 
+    /**
+     * Constructs an empty DrewPool.
+     */
     public DrewPool() {
         this(new Stack<>());
     }
 
+    /**
+     * Retrieves the list of currently drawn objects.
+     *
+     * @return A list of drawable objects.
+     */
     public List<Drawable> getDrewObjects() {
         return drewObjects;
     }
 
+    /**
+     * Adds a new drawable object to the pool.
+     *
+     * @param obj The drawable object to add.
+     */
     public void addObject(Drawable obj) {
         this.drewObjects.add(obj);
     }
 
+    /**
+     * Clears all drawable objects from the pool.
+     */
     public void clear() {
         this.drewObjects.clear();
     }
 
+    /**
+     * Removes a specific drawable object from the pool.
+     *
+     * @param obj The drawable object to remove.
+     */
     public void removeObject(final Drawable obj) {
         drewObjects.remove(obj);
     }
 
+    /**
+     * Undoes the last drawing action by moving the most recent object to a temporary removal stack.
+     */
     public void undo() {
         if (!drewObjects.isEmpty()) {
             final Drawable lastStroke = drewObjects.get(drewObjects.size() - 1);
@@ -43,6 +77,9 @@ public class DrewPool {
         }
     }
 
+    /**
+     * Redoes the last undone action by restoring the most recently removed object from the temporary stack.
+     */
     public void redo() {
         if (!temporaryRemovedDrawables.isEmpty()) {
             final Drawable lastRemovedStroke = temporaryRemovedDrawables.get(temporaryRemovedDrawables.size() - 1);
