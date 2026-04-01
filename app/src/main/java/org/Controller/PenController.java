@@ -5,9 +5,9 @@ import java.util.Objects;
 import org.model.DrewPool;
 import org.model.Viewport;
 import org.model.base.ARGBColor;
-import org.model.base.BrushContext;
 import org.model.base.Point;
 import org.model.base.Stroke;
+import org.model.base.context.BrushContext;
 import org.model.interfaces.Controller;
 import org.model.interfaces.Drawable;
 
@@ -35,6 +35,30 @@ public class PenController extends Controller {
     }
 
     /**
+     * Sets the brush context for this PenController, which determines the thickness and color of the strokes drawn.
+     * @param context The BrushContext to be used for drawing. Must not be null.
+     */
+    public void setContext(final BrushContext context) {
+        this.context = Objects.requireNonNull(context);
+    }
+
+    /**
+     * Sets the viewport for this PenController, which is used to convert screen coordinates to world coordinates.
+     * @param viewport The Viewport to be used for coordinate transformations. Must not be null.
+     */
+    public void setViewport(final Viewport viewport) {
+        this.viewport = Objects.requireNonNull(viewport);
+    }
+
+    /**
+     * Sets the stroke pool for this PenController, which is where new strokes are added when drawn.
+     * @param strokePool The DrewPool to which new strokes will be added. Must not be null.
+     */
+    public void setStrokePool(final DrewPool strokePool) {
+        this.strokePool = Objects.requireNonNull(strokePool);
+    }
+
+    /**
      * Converts screen coordinates to world coordinates based on the current viewport settings.
      *
      * @param x The x-coordinate on the screen.
@@ -56,10 +80,15 @@ public class PenController extends Controller {
      */
     @Override
     protected void onMousePressed(double x, double y) {
-        double thickness = context.getThickness();
-        ARGBColor color = context.getColor();
-        thickness = thickness / viewport.getZoom();
-        currentStroke = new Stroke(thickness, color);
+        // 1. Crea una copia del contesto attuale per il nuovo tratto.
+        BrushContext strokeContext = new BrushContext(context);
+
+        // 2. Applica la trasformazione dello spessore solo sulla copia.
+        double adjustedThickness = strokeContext.getThickness() / viewport.getZoom();
+        strokeContext.setThickness(adjustedThickness);
+
+        // 3. Passa la copia indipendente al costruttore dello Stroke.
+        currentStroke = new Stroke(strokeContext);
         strokePool.addObject(currentStroke);
         
         onMouseDragged(x, y);

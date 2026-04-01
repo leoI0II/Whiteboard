@@ -2,7 +2,9 @@ package org.model.base;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
+import org.model.base.context.BrushContext;
 import org.model.interfaces.Drawable;
 import org.model.interfaces.Erasable;
 import org.model.utils.BoundingBox;
@@ -14,8 +16,7 @@ import org.model.utils.BoundingBox;
  */
 public class Stroke implements Drawable, Erasable {
     final private List<Point> points;
-    private double thickness;
-    private ARGBColor color;
+    private BrushContext context;
     private BoundingBox boundingBox;
 
     /**
@@ -27,8 +28,13 @@ public class Stroke implements Drawable, Erasable {
      */
     public Stroke(final double thickness, final ARGBColor color) {
         this.points = new ArrayList<>();
-        this.thickness = thickness;
-        this.color = color;
+        this.context = new BrushContext(thickness, color);
+        boundingBox = new BoundingBox();
+    }
+
+    public Stroke(BrushContext context) {
+        this.points = new ArrayList<>();
+        this.context = Objects.requireNonNull(context);
         boundingBox = new BoundingBox();
     }
 
@@ -39,6 +45,8 @@ public class Stroke implements Drawable, Erasable {
      */
     public Stroke(List<Point> points) {
         this.points = points;
+        this.context = new BrushContext(); // Use default brush context
+        boundingBox = new BoundingBox();
     }
 
     private void updateBoundingBox(final Point point) {
@@ -80,12 +88,28 @@ public class Stroke implements Drawable, Erasable {
     }
 
     /**
+     * Gets the bounding box that encompasses all points in the stroke.
+     * @return The bounding box of the stroke.
+     */
+    public BoundingBox getBoundingBox() {
+        return boundingBox;
+    }
+
+    /**
+     * Gets the BrushContext associated with this stroke, which contains properties like thickness and color.
+     * @return The BrushContext of the stroke.
+     */
+    public BrushContext getContext() {
+        return context;
+    }
+
+    /**
      * Gets the thickness of the stroke.
      *
      * @return The stroke thickness.
      */
     public double getThickness() {
-        return thickness;
+        return context.getThickness();
     }
 
     /**
@@ -94,7 +118,7 @@ public class Stroke implements Drawable, Erasable {
      * @param thickness The new thickness value.
      */
     public void setThickness(float thickness) {
-        this.thickness = thickness;
+        context.setThickness(thickness);
     }
 
     /**
@@ -103,7 +127,7 @@ public class Stroke implements Drawable, Erasable {
      * @return The ARGBColor of the stroke.
      */
     public ARGBColor getColor() {
-        return color;
+        return context.getColor();
     }
 
     /**
@@ -112,7 +136,7 @@ public class Stroke implements Drawable, Erasable {
      * @param color The new ARGBColor for the stroke.
      */
     public void setColor(ARGBColor color) {
-        this.color = color;
+        context.setColor(color);
     }
 
     /**

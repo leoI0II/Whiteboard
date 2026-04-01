@@ -1,4 +1,6 @@
-package org.model.base;
+package org.model.base.context;
+
+import org.model.base.ARGBColor;
 
 public class BrushContext {
     
@@ -19,8 +21,27 @@ public class BrushContext {
         this.color = color;
     }
 
+    /**
+     * Constructs a BrushContext with default thickness and color.
+     */
     public BrushContext() {
         this(DEFAULT_THICKNESS, DEFAULT_COLOR);
+    }
+
+    /**
+     * Copy constructor for BrushContext.
+     * @param context
+     */
+    public BrushContext(BrushContext context) {
+        this(context.getThickness(), context.getColor());
+    }
+
+    /**
+     * Gets a copy of the current BrushContext.
+     * @return A new BrushContext instance with the same properties as the current context.
+     */
+    public BrushContext getContext() {
+        return new BrushContext(this);
     }
 
     /**
