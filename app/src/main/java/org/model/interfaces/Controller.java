@@ -10,6 +10,8 @@ import org.model.base.Point;
 public abstract class Controller {
     
     protected boolean isPressed;
+    protected double lastX;
+    protected double lastY;
 
     /**
      * Handles the initial mouse press event.
@@ -20,6 +22,8 @@ public abstract class Controller {
      */
     public void handleMousePressed(double x, double y) {
         isPressed = true;
+        lastX = x;
+        lastY = y;
         onMousePressed(x, y);
     }
 
@@ -33,6 +37,8 @@ public abstract class Controller {
     public void handleMouseDragged(double x, double y) {
         if (isPressed)
             onMouseDragged(x, y);
+        lastX = x;
+        lastY = y;
     }
 
     /**
@@ -45,6 +51,8 @@ public abstract class Controller {
     public void handleMouseReleased(double x, double y) {
         isPressed = false;
         onMouseReleased(x, y);
+        lastX = x;
+        lastY = y;
     }
 
     /**

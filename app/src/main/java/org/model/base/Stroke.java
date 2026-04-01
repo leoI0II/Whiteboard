@@ -4,16 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.model.interfaces.Drawable;
+import org.model.interfaces.Erasable;
+import org.model.utils.BoundingBox;
 
 /**
  * The Stroke class represents a single continuous line drawn by the user.
  * It implements the Drawable interface, allowing it to be rendered on a canvas. A stroke consists of a list of points,
  * a thickness, and a color.
  */
-public class Stroke implements Drawable {
+public class Stroke implements Drawable, Erasable {
     final private List<Point> points;
     private double thickness;
     private ARGBColor color;
+    private BoundingBox boundingBox;
 
     /**
      * Constructs a new Stroke with a specified thickness and color.
@@ -26,6 +29,7 @@ public class Stroke implements Drawable {
         this.points = new ArrayList<>();
         this.thickness = thickness;
         this.color = color;
+        boundingBox = new BoundingBox();
     }
 
     /**
@@ -35,6 +39,35 @@ public class Stroke implements Drawable {
      */
     public Stroke(List<Point> points) {
         this.points = points;
+    }
+
+    private void updateBoundingBox(final Point point) {
+        // check top left x
+        if (point.x() < boundingBox.getTopLeftX()) {
+            boundingBox.setTopLeftX(point.x());
+        }
+        // check top left y
+        if (point.x() > boundingBox.getBottomRightX()) {
+            boundingBox.setBottomRightX(point.x());
+        }
+        //check bottom right x
+        if (point.y() < boundingBox.getTopLeftY()) {
+            boundingBox.setTopLeftY(point.y());
+        }
+        // check bottom right y
+        if (point.y() > boundingBox.getBottomRightY()) {
+            boundingBox.setBottomRightY(point.y());
+        }
+    }
+
+    /**
+     * Adds a new point to the stroke's path.
+     *
+     * @param point
+     */
+    public void addPoint(final Point point) {
+        points.add(point);
+        updateBoundingBox(point);
     }
 
     /**

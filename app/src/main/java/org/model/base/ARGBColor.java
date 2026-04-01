@@ -11,6 +11,19 @@ package org.model.base;
  */
 public record ARGBColor(int alpha, int red, int green, int blue) {
 
+    public static final ARGBColor TRANSPARENT = new ARGBColor(0, 0, 0, 0);
+    public static final ARGBColor BLACK = new ARGBColor(0xFF, 0, 0, 0);
+    public static final ARGBColor WHITE = new ARGBColor(0xFF, 0xFF, 0xFF, 0xFF);
+    public static final ARGBColor RED = new ARGBColor(0xFF, 0xFF, 0, 0);
+    public static final ARGBColor GREEN = new ARGBColor(0xFF, 0, 0xFF, 0);
+    public static final ARGBColor BLUE = new ARGBColor(0xFF, 0, 0, 0xFF);
+    public static final ARGBColor YELLOW = new ARGBColor(0xFF, 0xFF, 0xFF, 0);
+    public static final ARGBColor CYAN = new ARGBColor(0xFF, 0, 0xFF, 0xFF);
+    public static final ARGBColor MAGENTA = new ARGBColor(0xFF, 0xFF, 0, 0xFF);
+    public static final ARGBColor GRAY = new ARGBColor(0xFF, 0x80, 0x80, 0x80);
+    public static final ARGBColor DARK_GRAY = new ARGBColor(0xFF, 0x40, 0x40, 0x40);
+    public static final ARGBColor LIGHT_GRAY = new ARGBColor(0xFF, 0xC0, 0xC0, 0xC0);
+
     /**
      * Compact constructor that validates all color components upon instantiation.
      *

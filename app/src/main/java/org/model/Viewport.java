@@ -1,5 +1,7 @@
 package org.model;
 
+import org.model.base.Point;
+
 /**
  * The Viewport class represents the state of the virtual camera, including its position (offset) and zoom level.
  * It provides methods to get and set these properties, which are essential for converting between
@@ -7,8 +9,8 @@ package org.model;
  */
 public class Viewport {
     
-    private long offsetX;
-    private long offsetY;
+    private double offsetX;
+    private double offsetY;
     private double zoom;
 
     /**
@@ -18,7 +20,7 @@ public class Viewport {
      * @param offsetY The initial vertical offset.
      * @param zoom The initial zoom level.
      */
-    public Viewport(long offsetX, long offsetY, double zoom) {
+    public Viewport(double offsetX, double offsetY, double zoom) {
         this.offsetX = offsetX;
         this.offsetY = offsetY;
         this.zoom = zoom;
@@ -29,7 +31,7 @@ public class Viewport {
      *
      * @return The horizontal offset.
      */
-    public long getOffsetX() {
+    public double getOffsetX() {
         return offsetX;
     }
 
@@ -38,7 +40,7 @@ public class Viewport {
      *
      * @param offsetX The new horizontal offset.
      */
-    public void setOffsetX(long offsetX) {
+    public void setOffsetX(double offsetX) {
         this.offsetX = offsetX;
     }
 
@@ -47,7 +49,7 @@ public class Viewport {
      *
      * @return The vertical offset.
      */
-    public long getOffsetY() {
+    public double getOffsetY() {
         return offsetY;
     }
 
@@ -56,8 +58,28 @@ public class Viewport {
      *
      * @param offsetY The new vertical offset.
      */
-    public void setOffsetY(long offsetY) {
+    public void setOffsetY(double offsetY) {
         this.offsetY = offsetY;
+    }
+
+    /**
+     * Sets the offset of the viewport.
+
+     * @param x
+     * @param y
+     */
+    public void setOffset(double x, double y) {
+        this.offsetX = x;
+        this.offsetY = y;
+    }
+
+    /**
+     * Gets the current offset of the viewport.
+     *
+     * @return Point representing the current offset.
+     */
+    public Point getOffset() {
+        return new Point(offsetX, offsetY);
     }
 
     /**
@@ -77,7 +99,5 @@ public class Viewport {
     public void setZoom(double zoom) {
         this.zoom = zoom;
     }
-
-
 
 }

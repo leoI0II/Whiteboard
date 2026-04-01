@@ -1,6 +1,5 @@
 package org.model;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
@@ -47,7 +46,8 @@ public class DrewPool {
      * @param obj The drawable object to add.
      */
     public void addObject(Drawable obj) {
-        this.drewObjects.add(obj);
+        this.drewObjects.push(obj);
+        temporaryRemovedDrawables.clear();
     }
 
     /**
@@ -71,9 +71,8 @@ public class DrewPool {
      */
     public void undo() {
         if (!drewObjects.isEmpty()) {
-            final Drawable lastStroke = drewObjects.get(drewObjects.size() - 1);
-            temporaryRemovedDrawables.add(lastStroke);
-            removeObject(lastStroke);
+            final Drawable lastStroke = drewObjects.pop();
+            temporaryRemovedDrawables.push(lastStroke);
         }
     }
 
@@ -82,9 +81,8 @@ public class DrewPool {
      */
     public void redo() {
         if (!temporaryRemovedDrawables.isEmpty()) {
-            final Drawable lastRemovedStroke = temporaryRemovedDrawables.get(temporaryRemovedDrawables.size() - 1);
+            final Drawable lastRemovedStroke = temporaryRemovedDrawables.pop();
             addObject(lastRemovedStroke);
-            temporaryRemovedDrawables.remove(lastRemovedStroke);
         }
     }
 

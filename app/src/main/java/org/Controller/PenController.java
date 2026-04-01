@@ -5,6 +5,7 @@ import java.util.Objects;
 import org.model.DrewPool;
 import org.model.Viewport;
 import org.model.base.ARGBColor;
+import org.model.base.BrushContext;
 import org.model.base.Point;
 import org.model.base.Stroke;
 import org.model.interfaces.Controller;
@@ -19,6 +20,7 @@ public class PenController extends Controller {
     private Stroke currentStroke;
     private DrewPool strokePool;
     private Viewport viewport;
+    private BrushContext context;
 
     /**
      * Constructs a PenController with the specified stroke pool and viewport.
@@ -54,8 +56,8 @@ public class PenController extends Controller {
      */
     @Override
     protected void onMousePressed(double x, double y) {
-        double thickness = 10;
-        ARGBColor color = new ARGBColor(0xff000000);
+        double thickness = context.getThickness();
+        ARGBColor color = context.getColor();
         thickness = thickness / viewport.getZoom();
         currentStroke = new Stroke(thickness, color);
         strokePool.addObject(currentStroke);
@@ -73,7 +75,7 @@ public class PenController extends Controller {
     @Override
     protected void onMouseDragged(double x, double y) {
         if (isPressed()) {
-            currentStroke.getPoints().add(getWorldPoint(x, y));
+            currentStroke.addPoint(getWorldPoint(x, y));
         }
     }
 
