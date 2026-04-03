@@ -30,7 +30,10 @@ public class BoundingBox {
      * Constructs a BoundingBox with default coordinates.
      */
     public BoundingBox() {
-        this(0, 0, 0, 0);
+        this(Double.POSITIVE_INFINITY
+            , Double.POSITIVE_INFINITY
+            , Double.NEGATIVE_INFINITY
+            , Double.NEGATIVE_INFINITY);
     }
 
     /**
@@ -41,6 +44,35 @@ public class BoundingBox {
      */
     public BoundingBox(final Point tl, final Point br) {
         this(tl.x(), tl.y(), br.x(), br.y());
+    }
+
+    public boolean intersects(BoundingBox other) {
+        return !(other.bottomRightX < this.topLeftX ||
+                other.topLeftX > this.bottomRightX ||
+                other.bottomRightY < this.topLeftY ||
+                other.topLeftY > this.bottomRightY);
+    }
+
+    /**
+     * Checks if this bounding box contains a given point.
+     *
+     * @param x The x-coordinate of the point.
+     * @param y The y-coordinate of the point.
+     * @return true if the point is within the bounding box, false otherwise.
+     */
+    public boolean contains(final double x, final double y) {
+        return x >= topLeftX && x <= bottomRightX &&
+            y >= topLeftY && y <= bottomRightY;
+    }
+
+    /**
+     * Checks if this bounding box contains a given point.
+     *
+     * @param point The point to check for containment.
+     * @return true if the point is within the bounding box, false otherwise.
+     */
+    public boolean contains(Point point) {
+        return contains(point.x(), point.y());
     }
 
     /**

@@ -2,11 +2,18 @@ package org.model.base.context;
 
 import org.model.base.ARGBColor;
 
+/**
+ * The BrushContext class encapsulates the properties of a brush used for drawing strokes.
+ * It includes attributes such as thickness and color, which define how the stroke will appear when rendered on a canvas. 
+ * This class provides constructors for creating a brush context with specific properties or using default values, 
+ * as well as getter and setter methods to access and modify these properties.
+ */
 public class BrushContext {
     
-    private double thickness;
-    private ARGBColor color;
+    private double thickness;               // Thickness of the brush (diameter of the stroke)
+    private ARGBColor color;                // Color of the brush
 
+    // Default values for thickness and color
     private static final double DEFAULT_THICKNESS = 10;
     private static final ARGBColor DEFAULT_COLOR = ARGBColor.BLACK;
 

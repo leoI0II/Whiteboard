@@ -27,6 +27,53 @@ public class Viewport {
     }
 
     /**
+     * Converts a screen X coordinate to a world X coordinate.
+     *
+     * @param x The screen X coordinate.
+     * @return The world X coordinate.
+     */
+    public double screenToWorldX(double x) {
+        return x / getZoom() + getOffsetX();
+    }
+
+    /**
+     * Converts a screen Y coordinate to a world Y coordinate.
+     *
+     * @param y The screen Y coordinate.
+     * @return The world Y coordinate.
+     */
+    public double screenToWorldY(double y) {
+        return y / getZoom() + getOffsetY();
+    }
+
+    /**
+     * Converts screen coordinates to world coordinates.
+     *
+     * @param x The screen X coordinate.
+     * @param y The screen Y coordinate.
+     * @return A Point object representing the corresponding world coordinates.
+     */
+    public Point screenToWorld(double x, double y) {
+        return new Point(screenToWorldX(x), screenToWorldY(y));
+    }
+
+    /**
+     * Gets the thickness adjusted for the current zoom level.
+     * @param thickness The original thickness.
+     * @return The adjusted thickness.
+     */
+    public double getZoomedThickness(double thickness) {
+        return thickness / zoom;
+    }
+
+    /**
+     * Constructs a Viewport with default offset (0, 0) and zoom level (1).
+     */
+    public Viewport() {
+        this(0, 0, 1);
+    }
+
+    /**
      * Gets the horizontal offset of the viewport.
      *
      * @return The horizontal offset.

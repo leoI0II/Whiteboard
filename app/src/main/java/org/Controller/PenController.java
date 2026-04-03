@@ -59,19 +59,6 @@ public class PenController extends Controller {
     }
 
     /**
-     * Converts screen coordinates to world coordinates based on the current viewport settings.
-     *
-     * @param x The x-coordinate on the screen.
-     * @param y The y-coordinate on the screen.
-     * @return A Point object representing the corresponding world coordinates.
-     */
-    private Point getWorldPoint(double x, double y) {
-        x = (x / viewport.getZoom()) + viewport.getOffsetX();
-        y = (y / viewport.getZoom()) + viewport.getOffsetY();
-        return new Point(x, y);
-    }
-
-    /**
      * Handles the mouse pressed event to begin a new stroke.
      * A new stroke is created with a default thickness and color, and added to the stroke pool.
      *
@@ -104,7 +91,7 @@ public class PenController extends Controller {
     @Override
     protected void onMouseDragged(double x, double y) {
         if (isPressed()) {
-            currentStroke.addPoint(getWorldPoint(x, y));
+            currentStroke.addPoint(viewport.screenToWorld(x, y));
         }
     }
 
