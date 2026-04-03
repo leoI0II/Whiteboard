@@ -141,17 +141,6 @@ public class Stroke implements Drawable, Erasable {
         context.setColor(color);
     }
 
-    /**
-     * Renders the stroke. This method is currently not implemented.
-     *
-     * @throws UnsupportedOperationException always.
-     */
-    @Override
-    public void render() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'Render'");
-    }
-
     @Override
     public boolean intersectsEraser(double eraserX, double eraserY, double eraserRadius) {
         for (int i = 0; i < points.size() - 1; i++) {

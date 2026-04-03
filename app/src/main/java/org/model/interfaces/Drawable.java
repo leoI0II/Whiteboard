@@ -8,12 +8,6 @@ import org.model.utils.BoundingBox;
  * the logic for drawing the object.
  */
 public interface Drawable {
-    
-    /**
-     * Renders the object on a canvas.
-     * The specific implementation of this method will determine how the object is visually represented.
-     */
-    public void render();
 
     /**
      * Returns the bounding box of the drawable object, which is used for various purposes such as hit testing and erasing.
