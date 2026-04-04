@@ -1,6 +1,7 @@
 package org.view;
 
 import org.model.DrewPool;
+import org.model.Viewport;
 import org.model.base.Stroke;
 import org.model.interfaces.Drawable;
 import org.view.interfaces.RendererVisitor;
@@ -13,6 +14,12 @@ import javafx.scene.shape.StrokeLineJoin;
 public class JfxBoardRenderer implements RendererVisitor {
 
     private GraphicsContext gc;
+    private Viewport viewport;
+
+    public JfxBoardRenderer() {
+        this.gc = null;
+        this.viewport = null;
+    }
 
     public JfxBoardRenderer(GraphicsContext gc) {
         this.gc = gc;
@@ -20,6 +27,10 @@ public class JfxBoardRenderer implements RendererVisitor {
 
     public void setGraphicsContext(GraphicsContext gc) {
         this.gc = gc;
+    }
+
+    public void setViewport(Viewport viewport) {
+        this.viewport = viewport;
     }
 
     public void render(DrewPool drewPool) {
@@ -47,11 +58,13 @@ public class JfxBoardRenderer implements RendererVisitor {
         gc.beginPath(); // Ставим кисть на бумагу
         
         // Перемещаемся в первую точку не оставляя следа
-        gc.moveTo(points.get(0).x(), points.get(0).y());
+        gc.moveTo(viewport.worldToScreenX(points.get(0).x()), 
+                    viewport.worldToScreenY(points.get(0).y()));
         
         // Проводим линии по всем остальным точкам
         for (int i = 1; i < points.size(); i++) {
-            gc.lineTo(points.get(i).x(), points.get(i).y());
+            gc.lineTo(viewport.worldToScreenX(points.get(i).x()), 
+                        viewport.worldToScreenY(points.get(i).y()));
         }
         
         // Физически заливаем краской пройденный путь
