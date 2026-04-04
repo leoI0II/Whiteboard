@@ -9,6 +9,7 @@ import org.model.base.context.BrushContext;
 import org.model.interfaces.Drawable;
 import org.model.interfaces.Erasable;
 import org.model.utils.BoundingBox;
+import org.view.interfaces.RendererVisitor;
 
 /**
  * The Stroke class represents a single continuous line drawn by the user.
@@ -153,36 +154,40 @@ public class Stroke implements Drawable, Erasable {
         return false;
     }
 
-private boolean lineIntersectsCircle(Point p1, Point p2, double eraserX, double eraserY, double eraserRadius) {
-    double dx = p2.x() - p1.x();
-    double dy = p2.y() - p1.y();
-    
-    // Квадрат длины отрезка
-    double segmentLengthSquared = dx * dx + dy * dy;
-    
-    double t = 0;
-    // Защита от деления на ноль (если p1 и p2 это одна и та же точка)
-    if (segmentLengthSquared > 0) {
-        // Скалярное произведение вектора отрезка и вектора от начала отрезка до ластика
-        double dotProduct = (eraserX - p1.x()) * dx + (eraserY - p1.y()) * dy;
-        t = dotProduct / segmentLengthSquared;
-        t = Math.max(0, Math.min(1, t)); // Зажимаем t между 0 и 1
+    private boolean lineIntersectsCircle(Point p1, Point p2, double eraserX, double eraserY, double eraserRadius) {
+        double dx = p2.x() - p1.x();
+        double dy = p2.y() - p1.y();
+        
+        // Квадрат длины отрезка
+        double segmentLengthSquared = dx * dx + dy * dy;
+        
+        double t = 0;
+        // Защита от деления на ноль (если p1 и p2 это одна и та же точка)
+        if (segmentLengthSquared > 0) {
+            // Скалярное произведение вектора отрезка и вектора от начала отрезка до ластика
+            double dotProduct = (eraserX - p1.x()) * dx + (eraserY - p1.y()) * dy;
+            t = dotProduct / segmentLengthSquared;
+            t = Math.max(0, Math.min(1, t)); // Зажимаем t между 0 и 1
+        }
+        
+        // Координаты ближайшей точки на отрезке
+        double closestX = p1.x() + t * dx;
+        double closestY = p1.y() + t * dy;
+        
+        // Квадрат расстояния от ластика до этой ближайшей точки
+        double distX = closestX - eraserX;
+        double distY = closestY - eraserY;
+        double distanceSquared = distX * distX + distY * distY;
+        
+        // Учитываем и радиус ластика, и половину толщины самой линии!
+        double targetRadius = eraserRadius + (getThickness() / 2.0);
+        
+        return distanceSquared <= targetRadius * targetRadius;
+    }
+
+    @Override
+    public void acceptRenderer(RendererVisitor visitor) {
+        visitor.visit(this);
     }
     
-    // Координаты ближайшей точки на отрезке
-    double closestX = p1.x() + t * dx;
-    double closestY = p1.y() + t * dy;
-    
-    // Квадрат расстояния от ластика до этой ближайшей точки
-    double distX = closestX - eraserX;
-    double distY = closestY - eraserY;
-    double distanceSquared = distX * distX + distY * distY;
-    
-    // Учитываем и радиус ластика, и половину толщины самой линии!
-    double targetRadius = eraserRadius + (getThickness() / 2.0);
-    
-    return distanceSquared <= targetRadius * targetRadius;
-}
-    
-
 }

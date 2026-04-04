@@ -1,6 +1,7 @@
 package org.model.interfaces;
 
 import org.model.utils.BoundingBox;
+import org.view.interfaces.RendererVisitor;
 
 /**
  * The Drawable interface defines a contract for objects that can be rendered on a canvas.
@@ -14,4 +15,6 @@ public interface Drawable {
      * @return The bounding box of the drawable object.
      */
     public BoundingBox getBoundingBox();
+
+    public void acceptRenderer(RendererVisitor visitor);
 }
