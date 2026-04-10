@@ -82,7 +82,7 @@ public class DrewPool {
     public void redo() {
         if (!temporaryRemovedDrawables.isEmpty()) {
             final Drawable lastRemovedStroke = temporaryRemovedDrawables.pop();
-            addObject(lastRemovedStroke);
+            this.drewObjects.push(lastRemovedStroke);
         }
     }
 

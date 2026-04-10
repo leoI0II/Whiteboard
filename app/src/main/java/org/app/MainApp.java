@@ -1,5 +1,7 @@
 package org.app;
 
+import java.security.Key;
+
 import org.Controller.PenController;
 import org.model.DrewPool;
 import org.model.Viewport;
@@ -8,8 +10,13 @@ import org.view.JfxBoardRenderer;
 
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 
 public class MainApp extends javafx.application.Application {
 
@@ -85,9 +92,28 @@ public class MainApp extends javafx.application.Application {
             redrawCanvas(canvas, drewPool, viewport);
         });
 
+        final KeyCombination undoKeyComb = new KeyCodeCombination(KeyCode.Z, KeyCombination.SHORTCUT_DOWN);
+        final KeyCombination redoKeyComb = new KeyCodeCombination(KeyCode.Y, KeyCombination.SHORTCUT_DOWN);
+        
         Scene scene = new Scene(rootPane, 800, 600);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Whiteboard App");
+        
+        scene.getAccelerators().put(undoKeyComb, () -> {
+            System.out.println("Undo triggered!");
+            drewPool.undo();
+            // Здесь ты должен вызвать метод undo() у своего контроллера, который управляет историей действий
+            // Например: historyManager.undo();
+            redrawCanvas(canvas, drewPool, viewport);
+        }); 
+        scene.getAccelerators().put(redoKeyComb, () -> {
+            System.out.println("Redo triggered!");
+            drewPool.redo();
+            // Здесь ты должен вызвать метод redo() у своего контроллера, который управляет историей действий
+            // Например: historyManager.redo();
+            redrawCanvas(canvas, drewPool, viewport);
+        });
+        
         primaryStage.show();
     }
 
