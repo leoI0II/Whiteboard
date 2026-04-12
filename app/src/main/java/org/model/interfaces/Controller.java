@@ -1,7 +1,5 @@
 package org.model.interfaces;
 
-import org.model.base.Point;
-
 /**
  * The Controller class is an abstract base class for handling user input from mouse events.
  * It provides a template for processing mouse presses, drags, and releases, allowing subclasses

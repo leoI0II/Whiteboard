@@ -1,11 +1,8 @@
 package org.app;
 
-import java.security.Key;
-
-import org.Controller.PenController;
+import org.Controller.ToolsControllerBuilder;
 import org.model.DrewPool;
 import org.model.Viewport;
-import org.model.base.context.BrushContext;
 import org.view.JfxBoardRenderer;
 
 import javafx.scene.Scene;
@@ -14,9 +11,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
 
 public class MainApp extends javafx.application.Application {
 
@@ -26,13 +21,12 @@ public class MainApp extends javafx.application.Application {
     public void start(Stage primaryStage) throws Exception {
         Viewport viewport = new Viewport(0, 0, 1.0);
         DrewPool drewPool = new DrewPool();
-        PenController penController = new PenController(drewPool, viewport);
-        BrushContext brushContext = new BrushContext();
+
+        var mainToolsetController = ToolsControllerBuilder.buildStandardToolset(drewPool, viewport);
+
         renderer = new JfxBoardRenderer(null); // GraphicsContext will be set later
         renderer.setViewport(viewport);
-        penController.setContext(brushContext);
-        penController.setViewport(viewport);
-
+        
         Canvas canvas = new Canvas(800, 600);
         Pane rootPane = new Pane(canvas);
         // Привязываем ширину и высоту холста к размерам окна
@@ -44,17 +38,17 @@ public class MainApp extends javafx.application.Application {
         canvas.heightProperty().addListener(observable -> redrawCanvas(canvas, drewPool, viewport));
 
         canvas.setOnMousePressed(event -> {
-            penController.handleMousePressed(event.getX(), event.getY());
+            mainToolsetController.handleMousePressed(event.getX(), event.getY());
             redrawCanvas(canvas, drewPool, viewport);
         });
 
         canvas.setOnMouseDragged(event -> {
-            penController.handleMouseDragged(event.getX(), event.getY());
+            mainToolsetController.handleMouseDragged(event.getX(), event.getY());
             redrawCanvas(canvas, drewPool, viewport);
         });
 
         canvas.setOnMouseReleased(event -> {
-            penController.handleMouseReleased(event.getX(), event.getY());
+            mainToolsetController.handleMouseReleased(event.getX(), event.getY());
             redrawCanvas(canvas, drewPool, viewport);
         });
 
