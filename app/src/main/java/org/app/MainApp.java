@@ -1,14 +1,24 @@
 package org.app;
 
+import java.util.HashMap;
+
+import org.Controller.Tools;
 import org.Controller.ToolsControllerBuilder;
 import org.model.DrewPool;
 import org.model.Viewport;
 import org.view.JfxBoardRenderer;
 
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.Button;
+import javafx.scene.control.Separator;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.scene.input.KeyCodeCombination;
@@ -102,19 +112,58 @@ public class MainApp extends javafx.application.Application {
             event.consume();
         });
 
-        canvas.setOnZoom(event -> {
-            // event.getZoomFactor() возвращает множитель (например, 1.2 для приближения)
-            // Здесь ты будешь менять viewport.setZoom(...)
-            var zoomFactor = event.getZoomFactor();
-            viewport.setZoom(viewport.getZoom() * zoomFactor);
-            System.out.println("Zoom factor: " + zoomFactor + ", New viewport zoom: " + viewport.getZoom());
+        final KeyCombination undoKeyComb = new KeyCodeCombination(KeyCode.Z, KeyCombination.SHORTCUT_DOWN);
+        final KeyCombination redoKeyComb = new KeyCodeCombination(KeyCode.Y, KeyCombination.SHORTCUT_DOWN);
+
+        HashMap<ToggleButton, Tools> toggleToolMap = new HashMap<>();
+
+        ToggleButton penButton = new ToggleButton("Pen");
+        toggleToolMap.put(penButton, Tools.PEN);
+        ToggleButton eraserButton = new ToggleButton("Eraser");
+        toggleToolMap.put(eraserButton, Tools.ERASER);
+        ToggleButton selectButton = new ToggleButton("Select");
+        toggleToolMap.put(selectButton, Tools.SELECTION);
+        Button undoButton = new Button("Undo");
+        undoButton.setOnAction(e -> {
+            System.out.println("Undo button clicked!");
+            drewPool.undo();
+            redrawCanvas(canvas, drewPool, viewport);
+        });
+        Button redoButton = new Button("Redo");
+        redoButton.setOnAction(e -> {
+            System.out.println("Redo button clicked!");
+            drewPool.redo();
             redrawCanvas(canvas, drewPool, viewport);
         });
 
-        final KeyCombination undoKeyComb = new KeyCodeCombination(KeyCode.Z, KeyCombination.SHORTCUT_DOWN);
-        final KeyCombination redoKeyComb = new KeyCodeCombination(KeyCode.Y, KeyCombination.SHORTCUT_DOWN);
+        ToggleGroup toolToggleGroup = new ToggleGroup();
+        penButton.setToggleGroup(toolToggleGroup);
+        eraserButton.setToggleGroup(toolToggleGroup);
+        selectButton.setToggleGroup(toolToggleGroup);
+        penButton.setSelected(true); // Выбираем перо по умолчанию
+        HBox toolBar = new HBox(10);
+        toolBar.setPadding(new Insets(10));
+        toolBar.getChildren()
+            .addAll(penButton,
+                    eraserButton,
+                    selectButton,
+                    new Separator(),
+                    undoButton,
+                    redoButton
+            );
+        toolToggleGroup.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
+            if (newToggle != null) {
+                Tools selectedTool = toggleToolMap.get(newToggle);
+                mainToolsetController.setActiveTool(selectedTool);
+                System.out.println("Selected tool: " + selectedTool);
+            }
+        });
+
+        BorderPane mainLayout = new BorderPane();
+        mainLayout.setCenter(rootPane);
+        mainLayout.setTop(toolBar);
         
-        Scene scene = new Scene(rootPane, 800, 600);
+        Scene scene = new Scene(mainLayout, 800, 600);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Whiteboard App");
         

@@ -63,6 +63,7 @@ public class DrewPool {
      * @param obj The drawable object to remove.
      */
     public void removeObject(final Drawable obj) {
+        temporaryRemovedDrawables.push(obj);
         drewObjects.remove(obj);
     }
 
