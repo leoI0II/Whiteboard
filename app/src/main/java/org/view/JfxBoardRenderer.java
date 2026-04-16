@@ -48,7 +48,7 @@ public class JfxBoardRenderer implements RendererVisitor {
         var c = stroke.getColor();
         // Конвертируем твой ARGBColor (0-255) в JavaFX Color (где прозрачность от 0.0 до 1.0)
         gc.setStroke(Color.rgb(c.red(), c.green(), c.blue(), c.alpha() / 255.0));
-        gc.setLineWidth(stroke.getThickness());
+        gc.setLineWidth(stroke.getThickness() * viewport.getZoom()); // Учитываем масштабирование
         
         // Делаем края линий круглыми и сглаженными (иначе при быстром рисовании будут острые углы)
         gc.setLineCap(StrokeLineCap.ROUND);

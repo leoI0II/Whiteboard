@@ -52,29 +52,54 @@ public class MainApp extends javafx.application.Application {
             redrawCanvas(canvas, drewPool, viewport);
         });
 
+        canvas.setOnZoom(event-> {
+            System.out.println("Zoom event, factor " + event.getZoomFactor());
+            viewport.setZoom(viewport.getZoom() * event.getZoomFactor());
+            redrawCanvas(canvas, drewPool, viewport);
+        });
+
         canvas.setOnScroll(event -> {
-            if (event.isShortcutDown()) {
-                // --- РЕЖИМ ЗУМА (Щипок тачпадом или Ctrl + Колесико) ---
-                // getDeltaY() обычно возвращает положительное число при приближении и отрицательное при отдалении
-                double zoomFactor = event.getDeltaY() > 0 ? 1.05 : 0.95; 
+            if (event.isControlDown() || event.isShortcutDown()) {
+                // --- MODO ZOOM (Ctrl + Scorrimento a due dita) ---
                 
-                double currentZoom = viewport.getZoom();
-                viewport.setZoom(currentZoom * zoomFactor);
+                // Calcoliamo la variazione di zoom in base alla velocità/lunghezza dello scroll
+                double zoomChange = event.getDeltaY() * 0.005; 
+                double zoomFactor = 1.0 + zoomChange;
                 
-                System.out.println("Zoom event! Текущий зум: " + viewport.getZoom());
+                double oldZoom = viewport.getZoom();
+                double newZoom = oldZoom * zoomFactor;
+
+                // Limiti di sicurezza (evita zoom infiniti o negativi)
+                // if (newZoom < 0.1) newZoom = 0.1;
+                // if (newZoom > 10.0) newZoom = 10.0;
+
+                double mouseX = event.getX();
+                double mouseY = event.getY();
+
+                // 1. Troviamo le coordinate del "Mondo" sotto il cursore ORA
+                double worldX = (mouseX / oldZoom) + viewport.getOffsetX();
+                double worldY = (mouseY / oldZoom) + viewport.getOffsetY();
+
+                // 2. Applichiamo il nuovo zoom
+                viewport.setZoom(newZoom);
+
+                // 3. Ricalcoliamo l'offset per mantenere il mondo incollato al cursore
+                double newOffsetX = worldX - (mouseX / newZoom);
+                double newOffsetY = worldY - (mouseY / newZoom);
+
+                viewport.setOffset(newOffsetX, newOffsetY);
+                System.out.println("Zoom al cursore! Nuovo zoom: " + newZoom);
+
             } else {
-                System.out.println("Scroll event! DeltaX: " + event.getDeltaX() + ", DeltaY: " + event.getDeltaY());
-                // --- РЕЖИМ СМЕЩЕНИЯ (Два пальца по тачпаду или просто Колесико) ---
-                // Обрати внимание: при смещении камеры мы вычитаем дельту, чтобы доска двигалась "вместе с пальцами"
+                // --- MODO SPOSTAMENTO (Scorrimento a due dita normale) ---
+                
                 double newX = viewport.getOffsetX() - event.getDeltaX();
                 double newY = viewport.getOffsetY() - event.getDeltaY();
                 viewport.setOffset(newX, newY);
             }
             
             redrawCanvas(canvas, drewPool, viewport);
-            
-            // Поглощаем событие, чтобы оно не улетело дальше по цепочке интерфейса
-            event.consume(); 
+            event.consume();
         });
 
         canvas.setOnZoom(event -> {
