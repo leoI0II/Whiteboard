@@ -13,6 +13,7 @@ public class ToolsControllerBuilder {
         penController.setContext( new BrushContext());
         toolsController.addController(Tools.PEN, penController);
         toolsController.addController(Tools.ERASER, new EraserController(new EraserContext(), drewPool, viewport));
+        toolsController.addController(Tools.HAND, new PanController(viewport));
         toolsController.setActiveTool(Tools.DEFAULT_TOOL);
         return toolsController;
     }

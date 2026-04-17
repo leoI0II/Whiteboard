@@ -55,7 +55,7 @@ public class MainApp extends javafx.application.Application {
         primaryStage.show();
     }
 
-        private void bindCanvasSize(Pane rootPane) {
+    private void bindCanvasSize(Pane rootPane) {
         canvas.widthProperty().bind(rootPane.widthProperty());
         canvas.heightProperty().bind(rootPane.heightProperty());
         canvas.widthProperty().addListener(observable -> redrawCanvas());
@@ -70,6 +70,10 @@ public class MainApp extends javafx.application.Application {
 
         canvas.setOnMouseDragged(event -> {
             mainToolsetController.handleMouseDragged(event.getX(), event.getY());
+            // MouseEvent e = (MouseEvent) event;
+            // if (e.getButton().equals(MouseButton.SECONDARY))
+            //     if (mainToolsetController.getActiveController() != mainToolsetController.getController(Tools.HAND))
+            //         mainToolsetController.getController(Tools.HAND).handleMouseDragged(event.getX(), event.getY());
             redrawCanvas();
         });
 
@@ -77,6 +81,7 @@ public class MainApp extends javafx.application.Application {
             mainToolsetController.handleMouseReleased(event.getX(), event.getY());
             redrawCanvas();
         });
+
     }
 
     private void setupGestures() {

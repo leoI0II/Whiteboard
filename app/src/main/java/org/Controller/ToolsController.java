@@ -26,6 +26,10 @@ public class ToolsController extends Controller {
         return activeController;
     }
 
+    public Controller getController(Tools tool) {
+        return controllers.get(tool);
+    }
+
     @Override
     protected void onMousePressed(double x, double y) {
         if (activeController != null) {

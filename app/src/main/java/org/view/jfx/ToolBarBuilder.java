@@ -19,6 +19,8 @@ public class ToolBarBuilder {
         penButton.setOnAction(e -> mainController.setActiveTool(Tools.PEN));
         ToggleButton eraserButton = new ToggleButton("Eraser");
         eraserButton.setOnAction(e -> mainController.setActiveTool(Tools.ERASER));
+        ToggleButton panButton = new ToggleButton("Pan");
+        panButton.setOnAction(e -> mainController.setActiveTool(Tools.HAND));
         ToggleButton selectButton = new ToggleButton("Select");
         selectButton.setOnAction(e -> mainController.setActiveTool(Tools.SELECTION));
         
@@ -57,6 +59,7 @@ public class ToolBarBuilder {
         toolBar.getChildren()
             .addAll(penButton,
                     eraserButton,
+                    panButton,
                     selectButton,
                     new Separator(),
                     undoButton,
