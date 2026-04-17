@@ -1,4 +1,4 @@
-package org.app;
+package org.app.jfx;
 
 import java.util.HashMap;
 
@@ -6,7 +6,7 @@ import org.Controller.Tools;
 import org.Controller.ToolsControllerBuilder;
 import org.model.DrewPool;
 import org.model.Viewport;
-import org.view.JfxBoardRenderer;
+import org.view.jfx.BoardRenderer;
 
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -25,7 +25,7 @@ import javafx.scene.input.KeyCodeCombination;
 
 public class MainApp extends javafx.application.Application {
 
-    private JfxBoardRenderer renderer;
+    private BoardRenderer renderer;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -34,7 +34,7 @@ public class MainApp extends javafx.application.Application {
 
         var mainToolsetController = ToolsControllerBuilder.buildStandardToolset(drewPool, viewport);
 
-        renderer = new JfxBoardRenderer(null); // GraphicsContext will be set later
+        renderer = new BoardRenderer(null); // GraphicsContext will be set later
         renderer.setViewport(viewport);
         
         Canvas canvas = new Canvas(800, 600);

@@ -1,4 +1,4 @@
-package org.app;
+package org.app.jfx;
 
 public class Launcher {
     public static void main(String[] args) {

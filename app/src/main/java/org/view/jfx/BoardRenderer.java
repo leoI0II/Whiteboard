@@ -1,4 +1,4 @@
-package org.view;
+package org.view.jfx;
 
 import org.model.DrewPool;
 import org.model.Viewport;
@@ -11,17 +11,17 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
 
-public class JfxBoardRenderer implements RendererVisitor {
+public class BoardRenderer implements RendererVisitor {
 
     private GraphicsContext gc;
     private Viewport viewport;
 
-    public JfxBoardRenderer() {
+    public BoardRenderer() {
         this.gc = null;
         this.viewport = null;
     }
 
-    public JfxBoardRenderer(GraphicsContext gc) {
+    public BoardRenderer(GraphicsContext gc) {
         this.gc = gc;
     }
 
