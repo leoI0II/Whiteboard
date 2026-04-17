@@ -3,10 +3,12 @@ package org.app.jfx;
 import java.util.HashMap;
 
 import org.Controller.Tools;
+import org.Controller.ToolsController;
 import org.Controller.ToolsControllerBuilder;
 import org.model.DrewPool;
 import org.model.Viewport;
 import org.view.jfx.BoardRenderer;
+import org.view.jfx.ToolBarBuilder;
 
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -26,46 +28,70 @@ import javafx.scene.input.KeyCodeCombination;
 public class MainApp extends javafx.application.Application {
 
     private BoardRenderer renderer;
+    private Canvas canvas;
+    private Viewport viewport;
+    private DrewPool drewPool;
+    private ToolsController mainToolsetController;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Viewport viewport = new Viewport(0, 0, 1.0);
-        DrewPool drewPool = new DrewPool();
+        this.viewport = new Viewport(0, 0, 1.0);
+        this.drewPool = new DrewPool();
 
-        var mainToolsetController = ToolsControllerBuilder.buildStandardToolset(drewPool, viewport);
+        this.mainToolsetController = ToolsControllerBuilder.buildStandardToolset(drewPool, viewport);
 
-        renderer = new BoardRenderer(null); // GraphicsContext will be set later
+        this.renderer = new BoardRenderer(null); // GraphicsContext will be set later
         renderer.setViewport(viewport);
         
-        Canvas canvas = new Canvas(800, 600);
+        this.canvas = new Canvas(800, 600);
         Pane rootPane = new Pane(canvas);
-        // Привязываем ширину и высоту холста к размерам окна
+        bindCanvasSize(rootPane);
+        setupMouseEvents();
+        setupGestures();
+        
+        HBox toolBar = ToolBarBuilder.buildToolBar(mainToolsetController, drewPool, this::redrawCanvas);
+        
+        BorderPane mainLayout = new BorderPane();
+        mainLayout.setCenter(rootPane);
+        mainLayout.setTop(toolBar);
+        Scene scene = new Scene(mainLayout, 800, 600);
+
+        setupKeyboardShortcuts(scene);
+        
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("Whiteboard App");
+        primaryStage.show();
+    }
+
+        private void bindCanvasSize(Pane rootPane) {
         canvas.widthProperty().bind(rootPane.widthProperty());
         canvas.heightProperty().bind(rootPane.heightProperty());
+        canvas.widthProperty().addListener(observable -> redrawCanvas());
+        canvas.heightProperty().addListener(observable -> redrawCanvas());
+    }
 
-        // Окно растянулось -> холст растянулся -> надо перерисовать картинку, чтобы она не стерлась!
-        canvas.widthProperty().addListener(observable -> redrawCanvas(canvas, drewPool, viewport));
-        canvas.heightProperty().addListener(observable -> redrawCanvas(canvas, drewPool, viewport));
-
+    private void setupMouseEvents() {
         canvas.setOnMousePressed(event -> {
             mainToolsetController.handleMousePressed(event.getX(), event.getY());
-            redrawCanvas(canvas, drewPool, viewport);
+            redrawCanvas();
         });
 
         canvas.setOnMouseDragged(event -> {
             mainToolsetController.handleMouseDragged(event.getX(), event.getY());
-            redrawCanvas(canvas, drewPool, viewport);
+            redrawCanvas();
         });
 
         canvas.setOnMouseReleased(event -> {
             mainToolsetController.handleMouseReleased(event.getX(), event.getY());
-            redrawCanvas(canvas, drewPool, viewport);
+            redrawCanvas();
         });
+    }
 
+    private void setupGestures() {
         canvas.setOnZoom(event-> {
             System.out.println("Zoom event, factor " + event.getZoomFactor());
             viewport.setZoom(viewport.getZoom() * event.getZoomFactor());
-            redrawCanvas(canvas, drewPool, viewport);
+            redrawCanvas();
         });
 
         canvas.setOnScroll(event -> {
@@ -78,11 +104,7 @@ public class MainApp extends javafx.application.Application {
                 
                 double oldZoom = viewport.getZoom();
                 double newZoom = oldZoom * zoomFactor;
-
-                // Limiti di sicurezza (evita zoom infiniti o negativi)
-                // if (newZoom < 0.1) newZoom = 0.1;
-                // if (newZoom > 10.0) newZoom = 10.0;
-
+                
                 double mouseX = event.getX();
                 double mouseY = event.getY();
 
@@ -108,92 +130,31 @@ public class MainApp extends javafx.application.Application {
                 viewport.setOffset(newX, newY);
             }
             
-            redrawCanvas(canvas, drewPool, viewport);
+            redrawCanvas();
             event.consume();
         });
-
-        final KeyCombination undoKeyComb = new KeyCodeCombination(KeyCode.Z, KeyCombination.SHORTCUT_DOWN);
-        final KeyCombination redoKeyComb = new KeyCodeCombination(KeyCode.Y, KeyCombination.SHORTCUT_DOWN);
-
-        HashMap<ToggleButton, Tools> toggleToolMap = new HashMap<>();
-
-        ToggleButton penButton = new ToggleButton("Pen");
-        toggleToolMap.put(penButton, Tools.PEN);
-        ToggleButton eraserButton = new ToggleButton("Eraser");
-        toggleToolMap.put(eraserButton, Tools.ERASER);
-        ToggleButton selectButton = new ToggleButton("Select");
-        toggleToolMap.put(selectButton, Tools.SELECTION);
-        Button undoButton = new Button("Undo");
-        undoButton.setOnAction(e -> {
-            System.out.println("Undo button clicked!");
-            drewPool.undo();
-            redrawCanvas(canvas, drewPool, viewport);
-        });
-        Button redoButton = new Button("Redo");
-        redoButton.setOnAction(e -> {
-            System.out.println("Redo button clicked!");
-            drewPool.redo();
-            redrawCanvas(canvas, drewPool, viewport);
-        });
-
-        ToggleGroup toolToggleGroup = new ToggleGroup();
-        penButton.setToggleGroup(toolToggleGroup);
-        eraserButton.setToggleGroup(toolToggleGroup);
-        selectButton.setToggleGroup(toolToggleGroup);
-        penButton.setSelected(true); // Выбираем перо по умолчанию
-        HBox toolBar = new HBox(10);
-        toolBar.setPadding(new Insets(10));
-        toolBar.getChildren()
-            .addAll(penButton,
-                    eraserButton,
-                    selectButton,
-                    new Separator(),
-                    undoButton,
-                    redoButton
-            );
-        toolToggleGroup.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
-            if (newToggle != null) {
-                Tools selectedTool = toggleToolMap.get(newToggle);
-                mainToolsetController.setActiveTool(selectedTool);
-                System.out.println("Selected tool: " + selectedTool);
-            }
-        });
-
-        BorderPane mainLayout = new BorderPane();
-        mainLayout.setCenter(rootPane);
-        mainLayout.setTop(toolBar);
-        
-        Scene scene = new Scene(mainLayout, 800, 600);
-        primaryStage.setScene(scene);
-        primaryStage.setTitle("Whiteboard App");
-        
-        scene.getAccelerators().put(undoKeyComb, () -> {
-            System.out.println("Undo triggered!");
-            drewPool.undo();
-            // Здесь ты должен вызвать метод undo() у своего контроллера, который управляет историей действий
-            // Например: historyManager.undo();
-            redrawCanvas(canvas, drewPool, viewport);
-        }); 
-        scene.getAccelerators().put(redoKeyComb, () -> {
-            System.out.println("Redo triggered!");
-            drewPool.redo();
-            // Здесь ты должен вызвать метод redo() у своего контроллера, который управляет историей действий
-            // Например: historyManager.redo();
-            redrawCanvas(canvas, drewPool, viewport);
-        });
-        
-        primaryStage.show();
     }
 
-    private void redrawCanvas(Canvas canvas, DrewPool pool, Viewport viewport) {
+    private void setupKeyboardShortcuts(Scene scene) {
+        KeyCombination undoKey = new KeyCodeCombination(KeyCode.Z, KeyCombination.SHORTCUT_DOWN);
+        KeyCombination redoKey = new KeyCodeCombination(KeyCode.Y, KeyCombination.SHORTCUT_DOWN);
+
+        scene.getAccelerators().put(undoKey, () -> {
+            drewPool.undo();
+            redrawCanvas();
+        }); 
+
+        scene.getAccelerators().put(redoKey, () -> {
+            drewPool.redo();
+            redrawCanvas();
+        });
+    }
+
+    private void redrawCanvas() {
         var gc = canvas.getGraphicsContext2D();
         renderer.setGraphicsContext(gc);
-        // Очищаем экран каждый кадр
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        
-        // Здесь должен быть цикл, который рисует все объекты из pool...
-        // Но как именно их рисовать?
-        renderer.render(pool);
+        renderer.render(drewPool);
     }
 
     public static void main(String[] args) {
