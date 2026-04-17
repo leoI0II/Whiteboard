@@ -1,7 +1,5 @@
 package org.view.jfx;
 
-import java.util.HashMap;
-
 import org.Controller.Tools;
 import org.Controller.ToolsController;
 import org.model.DrewPool;
@@ -16,14 +14,13 @@ import javafx.scene.layout.HBox;
 public class ToolBarBuilder {
     
     public static HBox buildToolBar(ToolsController mainController, DrewPool pool, Runnable requestRedraw) {
-        HashMap<ToggleButton, Tools> toggleToolMap = new HashMap<>();
 
         ToggleButton penButton = new ToggleButton("Pen");
-        toggleToolMap.put(penButton, Tools.PEN);
+        penButton.setOnAction(e -> mainController.setActiveTool(Tools.PEN));
         ToggleButton eraserButton = new ToggleButton("Eraser");
-        toggleToolMap.put(eraserButton, Tools.ERASER);
+        eraserButton.setOnAction(e -> mainController.setActiveTool(Tools.ERASER));
         ToggleButton selectButton = new ToggleButton("Select");
-        toggleToolMap.put(selectButton, Tools.SELECTION);
+        selectButton.setOnAction(e -> mainController.setActiveTool(Tools.SELECTION));
         
         Button undoButton = new Button("Undo");
         undoButton.setDisable(true);
@@ -66,13 +63,6 @@ public class ToolBarBuilder {
                     redoButton,
                     clearButton
             );
-        toolToggleGroup.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
-            if (newToggle != null) {
-                Tools selectedTool = toggleToolMap.get(newToggle);
-                mainController.setActiveTool(selectedTool);
-                System.out.println("Selected tool: " + selectedTool);
-            }
-        });
         return toolBar;
     }
 }
