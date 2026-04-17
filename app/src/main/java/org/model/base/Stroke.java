@@ -7,6 +7,7 @@ import java.util.Objects;
 import org.model.base.context.BrushContext;
 import org.model.interfaces.Drawable;
 import org.model.interfaces.Erasable;
+import org.model.interfaces.Selectable;
 import org.model.utils.BoundingBox;
 import org.view.interfaces.RendererVisitor;
 
@@ -15,7 +16,7 @@ import org.view.interfaces.RendererVisitor;
  * It implements the Drawable interface, allowing it to be rendered on a canvas. A stroke consists of a list of points,
  * a thickness, and a color.
  */
-public class Stroke implements Drawable, Erasable {
+public class Stroke implements Drawable, Erasable, Selectable {
     final private List<Point> points;
     private BrushContext context;
     private BoundingBox boundingBox;
