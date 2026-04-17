@@ -24,16 +24,29 @@ public class ToolBarBuilder {
         toggleToolMap.put(eraserButton, Tools.ERASER);
         ToggleButton selectButton = new ToggleButton("Select");
         toggleToolMap.put(selectButton, Tools.SELECTION);
+        
         Button undoButton = new Button("Undo");
+        undoButton.setDisable(true);
         undoButton.setOnAction(e -> {
             System.out.println("Undo button clicked!");
             pool.undo();
             requestRedraw.run();
         });
         Button redoButton = new Button("Redo");
+        redoButton.setDisable(true);
         redoButton.setOnAction(e -> {
             System.out.println("Redo button clicked!");
             pool.redo();
+            requestRedraw.run();
+        });
+        pool.addObserver((canUndo, canRedo) -> {
+            undoButton.setDisable(!canUndo);
+            redoButton.setDisable(!canRedo);
+        });
+        Button clearButton = new Button("Clear");
+        clearButton.setOnAction(e -> {
+            System.out.println("Clear button clicked!");
+            pool.clear();
             requestRedraw.run();
         });
 
@@ -50,7 +63,8 @@ public class ToolBarBuilder {
                     selectButton,
                     new Separator(),
                     undoButton,
-                    redoButton
+                    redoButton,
+                    clearButton
             );
         toolToggleGroup.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
             if (newToggle != null) {

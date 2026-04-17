@@ -117,8 +117,13 @@ public class MainApp extends javafx.application.Application {
             } else {
                 // --- MODO SPOSTAMENTO (Scorrimento a due dita normale) ---
                 
-                double newX = viewport.getOffsetX() - event.getDeltaX();
-                double newY = viewport.getOffsetY() - event.getDeltaY();
+                // Переводим пиксели экрана в координаты мира с учетом текущего масштаба
+                double deltaXWorld = event.getDeltaX() / viewport.getZoom();
+                double deltaYWorld = event.getDeltaY() / viewport.getZoom();
+                
+                // Вычитаем уже "мировую" дельту
+                double newX = viewport.getOffsetX() - deltaXWorld;
+                double newY = viewport.getOffsetY() - deltaYWorld;
                 viewport.setOffset(newX, newY);
             }
             

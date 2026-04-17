@@ -1,9 +1,11 @@
 package org.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
 import org.model.interfaces.Drawable;
+import org.model.interfaces.HistoryObserver;
 
 /**
  * The DrewPool class manages a collection of drawable objects.
@@ -13,6 +15,7 @@ import org.model.interfaces.Drawable;
 public class DrewPool {
     private final Stack<Drawable> drewObjects;
     private final Stack<Drawable> temporaryRemovedDrawables;
+    private final List<HistoryObserver> historyObservers = new ArrayList<>();
 
     /**
      * Constructs a DrewPool with a pre-existing stack of drawable objects.
@@ -31,6 +34,19 @@ public class DrewPool {
         this(new Stack<>());
     }
 
+    public void addObserver(HistoryObserver observer) {
+        // Implementation for adding an observer to listen for history changes
+        historyObservers.add(observer);
+    }
+
+    private void notifyHistoryObservers() {
+        boolean canUndo = !drewObjects.isEmpty();
+        boolean canRedo = !temporaryRemovedDrawables.isEmpty();
+        for (var observer : historyObservers) {
+            observer.onHistoryChanged(canUndo, canRedo);
+        }
+    }
+
     /**
      * Retrieves the list of currently drawn objects.
      *
@@ -41,6 +57,15 @@ public class DrewPool {
     }
 
     /**
+     * Retrieves the list of temporarily removed drawable objects, which can be used for redo operations.
+     *
+     * @return A list of temporarily removed drawable objects.
+     */
+    public List<Drawable> getTemporaryRemovedDrawables() {
+        return temporaryRemovedDrawables;
+    }
+
+    /**
      * Adds a new drawable object to the pool.
      *
      * @param obj The drawable object to add.
@@ -48,13 +73,16 @@ public class DrewPool {
     public void addObject(Drawable obj) {
         this.drewObjects.push(obj);
         temporaryRemovedDrawables.clear();
+        notifyHistoryObservers();
     }
 
     /**
      * Clears all drawable objects from the pool.
      */
     public void clear() {
+        temporaryRemovedDrawables.addAll(drewObjects);
         this.drewObjects.clear();
+        notifyHistoryObservers();
     }
 
     /**
@@ -65,6 +93,7 @@ public class DrewPool {
     public void removeObject(final Drawable obj) {
         temporaryRemovedDrawables.push(obj);
         drewObjects.remove(obj);
+        notifyHistoryObservers();
     }
 
     /**
@@ -74,6 +103,7 @@ public class DrewPool {
         if (!drewObjects.isEmpty()) {
             final Drawable lastStroke = drewObjects.pop();
             temporaryRemovedDrawables.push(lastStroke);
+            notifyHistoryObservers();
         }
     }
 
@@ -84,6 +114,7 @@ public class DrewPool {
         if (!temporaryRemovedDrawables.isEmpty()) {
             final Drawable lastRemovedStroke = temporaryRemovedDrawables.pop();
             this.drewObjects.push(lastRemovedStroke);
+            notifyHistoryObservers();
         }
     }
 
