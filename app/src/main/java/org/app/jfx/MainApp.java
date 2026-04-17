@@ -1,8 +1,5 @@
 package org.app.jfx;
 
-import java.util.HashMap;
-
-import org.Controller.Tools;
 import org.Controller.ToolsController;
 import org.Controller.ToolsControllerBuilder;
 import org.model.DrewPool;
@@ -10,13 +7,8 @@ import org.model.Viewport;
 import org.view.jfx.BoardRenderer;
 import org.view.jfx.ToolBarBuilder;
 
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Button;
-import javafx.scene.control.Separator;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
