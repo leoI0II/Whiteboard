@@ -4,12 +4,9 @@ import java.util.Objects;
 
 import org.model.DrewPool;
 import org.model.Viewport;
-import org.model.base.ARGBColor;
-import org.model.base.Point;
 import org.model.base.Stroke;
 import org.model.base.context.BrushContext;
 import org.model.interfaces.Controller;
-import org.model.interfaces.Drawable;
 
 /**
  * The PenController class is responsible for handling user input to draw strokes on the canvas.

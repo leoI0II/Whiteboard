@@ -3,7 +3,6 @@ package org.model.base;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 
 import org.model.base.context.BrushContext;
 import org.model.interfaces.Drawable;

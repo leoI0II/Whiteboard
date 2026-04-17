@@ -1,6 +1,5 @@
 package org.Controller;
 
-import java.time.chrono.Era;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -11,7 +10,6 @@ import org.model.base.context.EraserContext;
 import org.model.interfaces.Controller;
 import org.model.interfaces.Drawable;
 import org.model.interfaces.Erasable;
-import org.model.base.Point;
 
 public class EraserController extends Controller {
 
@@ -76,10 +74,6 @@ public class EraserController extends Controller {
 
     private boolean checkExactCollision(final Erasable item, final double worldX, final double worldY, final double radius) {
         return item.intersectsEraser(worldX, worldY, radius);
-    }
-
-    private boolean checkExactCollision(final Erasable item, final Point point, final double radius) {
-        return checkExactCollision(item, point.x(), point.y(), radius);
     }
 
     @Override
