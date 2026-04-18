@@ -63,5 +63,10 @@ public class SelectController extends Controller {
     public void clearSelection() {
         selectedItems.clear();
     }
+
+    @Override
+    protected void onMouseMoved(double x, double y) {
+         
+    }
     
 }

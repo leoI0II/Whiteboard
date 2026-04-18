@@ -31,6 +31,11 @@ public class Eraser implements Drawable {
         return pointY;
     }
 
+    public void setPoint(double x, double y) {
+        this.pointX = x;
+        this.pointY = y;
+    }
+
     @Override
     public void acceptRenderer(RendererVisitor visitor) {
         // Eraser is not rendered, so this method can be left empty or throw an exception if desired.

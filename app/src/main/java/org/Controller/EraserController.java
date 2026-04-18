@@ -50,6 +50,7 @@ public class EraserController extends Controller {
         
         double worldX = viewport.screenToWorldX(x);
         double worldY = viewport.screenToWorldY(y);
+        eraser.setPoint(worldX, worldY);
         var eraserBox = eraser.getContext().getBoundingBox(worldX, worldY);
 
         List<Drawable> itemsToRemove = new ArrayList<>();
@@ -75,6 +76,13 @@ public class EraserController extends Controller {
     @Override
     protected void onMouseReleased(double x, double y) {
         contextItems.clear();
+    }
+
+    @Override
+    protected void onMouseMoved(double x, double y) {
+        double worldX = viewport.screenToWorldX(x);
+        double worldY = viewport.screenToWorldY(y);
+        eraser.setPoint(worldX, worldY);
     }
 
     

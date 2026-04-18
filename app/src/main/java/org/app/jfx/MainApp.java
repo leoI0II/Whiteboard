@@ -23,7 +23,8 @@ import javafx.scene.input.KeyCodeCombination;
 public class MainApp extends javafx.application.Application {
 
     private BoardRenderer renderer;
-    private Canvas canvas;
+    private Canvas mainCanvas;
+    private Canvas cursorCanvas;
     private Viewport viewport;
     private DrewPool drewPool;
     private Eraser eraser;
@@ -42,8 +43,10 @@ public class MainApp extends javafx.application.Application {
         renderer.setViewport(viewport);
         renderer.setContextSetting(contextSetting);
         
-        this.canvas = new Canvas(800, 600);
-        Pane rootPane = new Pane(canvas);
+        this.mainCanvas = new Canvas(800, 600);
+        this.cursorCanvas = new Canvas(800, 600);
+        this.cursorCanvas.setMouseTransparent(true);
+        Pane rootPane = new Pane(mainCanvas, cursorCanvas);
         bindCanvasSize(rootPane);
         setupMouseEvents();
         setupGestures();
@@ -63,28 +66,37 @@ public class MainApp extends javafx.application.Application {
     }
 
     private void bindCanvasSize(Pane rootPane) {
-        canvas.widthProperty().bind(rootPane.widthProperty());
-        canvas.heightProperty().bind(rootPane.heightProperty());
-        canvas.widthProperty().addListener(observable -> redrawCanvas());
-        canvas.heightProperty().addListener(observable -> redrawCanvas());
+        mainCanvas.widthProperty().bind(rootPane.widthProperty());
+        mainCanvas.heightProperty().bind(rootPane.heightProperty());
+        
+        cursorCanvas.widthProperty().bind(rootPane.widthProperty());
+        cursorCanvas.heightProperty().bind(rootPane.heightProperty());
+
+        mainCanvas.widthProperty().addListener(observable -> redrawCanvas());
+        mainCanvas.heightProperty().addListener(observable -> redrawCanvas());
     }
 
     private void setupMouseEvents() {
-        canvas.setOnMousePressed(event -> {
+        mainCanvas.setOnMouseMoved(event -> {
+            mainToolsetController.handleMouseMoved(event.getX(), event.getY());
+            redrawCursorCanvas();
+        });
+        mainCanvas.setOnMousePressed(event -> {
             mainToolsetController.handleMousePressed(event.getX(), event.getY());
             redrawCanvas();
         });
 
-        canvas.setOnMouseDragged(event -> {
+        mainCanvas.setOnMouseDragged(event -> {
             mainToolsetController.handleMouseDragged(event.getX(), event.getY());
             // MouseEvent e = (MouseEvent) event;
             // if (e.getButton().equals(MouseButton.SECONDARY))
             //     if (mainToolsetController.getActiveController() != mainToolsetController.getController(Tools.HAND))
             //         mainToolsetController.getController(Tools.HAND).handleMouseDragged(event.getX(), event.getY());
             redrawCanvas();
+            redrawCursorCanvas();
         });
 
-        canvas.setOnMouseReleased(event -> {
+        mainCanvas.setOnMouseReleased(event -> {
             mainToolsetController.handleMouseReleased(event.getX(), event.getY());
             redrawCanvas();
         });
@@ -92,13 +104,13 @@ public class MainApp extends javafx.application.Application {
     }
 
     private void setupGestures() {
-        canvas.setOnZoom(event-> {
+        mainCanvas.setOnZoom(event-> {
             System.out.println("Zoom event, factor " + event.getZoomFactor());
             viewport.setZoom(viewport.getZoom() * event.getZoomFactor());
             redrawCanvas();
         });
 
-        canvas.setOnScroll(event -> {
+        mainCanvas.setOnScroll(event -> {
             if (event.isControlDown() || event.isShortcutDown()) {
                 // --- MODO ZOOM (Ctrl + Scorrimento a due dita) ---
                 
@@ -160,11 +172,18 @@ public class MainApp extends javafx.application.Application {
     }
 
     private void redrawCanvas() {
-        var gc = canvas.getGraphicsContext2D();
+        var gc = mainCanvas.getGraphicsContext2D();
         renderer.setGraphicsContext(gc);
-        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        gc.clearRect(0, 0, mainCanvas.getWidth(), mainCanvas.getHeight());
         renderer.render(drewPool);
+    }
 
+    private void redrawCursorCanvas() {
+        var gc = cursorCanvas.getGraphicsContext2D();
+        renderer.setGraphicsContext(gc);
+        gc.clearRect(0, 0, cursorCanvas.getWidth(), cursorCanvas.getHeight());
+        // Here you could draw a custom cursor or tool preview based on the active tool and mouse position
+        
         if (mainToolsetController.getActiveTool() == Tools.ERASER) {
             // Optionally, you could render a visual representation of the eraser cursor here
             renderer.render(eraser);

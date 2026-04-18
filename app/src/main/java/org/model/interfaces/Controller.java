@@ -11,6 +11,12 @@ public abstract class Controller {
     protected double lastX;
     protected double lastY;
 
+    public void handleMouseMoved(double x, double y) {
+        lastX = x;
+        lastY = y;
+        onMouseMoved(x, y);
+    }
+
     /**
      * Handles the initial mouse press event.
      * This method sets the pressed state to true and calls the onMousePressed method to be implemented by subclasses.
@@ -61,6 +67,14 @@ public abstract class Controller {
     public boolean isPressed() {
         return isPressed;
     }
+
+    /**
+     * Abstract method to be implemented by subclasses to handle the mouse moved event.
+     *
+     * @param x The x-coordinate of the mouse movement.
+     * @param y The y-coordinate of the mouse movement.
+     */
+    protected abstract void onMouseMoved(double x, double y);;
 
     /**
      * Abstract method to be implemented by subclasses to handle the mouse pressed event.

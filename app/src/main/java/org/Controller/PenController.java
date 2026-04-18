@@ -104,6 +104,11 @@ public class PenController extends Controller {
         currentStroke = null;
     }
 
+    @Override
+    protected void onMouseMoved(double x, double y) {
+        
+    }
+
     
     
 }

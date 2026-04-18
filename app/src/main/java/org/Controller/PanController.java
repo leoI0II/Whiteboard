@@ -28,6 +28,11 @@ public class PanController extends Controller {
     @Override
     protected void onMouseReleased(double x, double y) {}
 
+    @Override
+    protected void onMouseMoved(double x, double y) {
+        
+    }
+
     
 
 }

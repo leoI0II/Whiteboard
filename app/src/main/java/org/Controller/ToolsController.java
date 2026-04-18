@@ -79,4 +79,11 @@ public class ToolsController extends Controller {
         }
     }
 
+    @Override
+    protected void onMouseMoved(double x, double y) {
+        if (activeController != null) {
+            activeController.handleMouseMoved(x, y);
+        }
+    }
+
 }
