@@ -2,14 +2,15 @@ package org.Controller;
 
 import org.model.DrewPool;
 import org.model.Viewport;
+import org.model.base.Eraser;
 
 public class ToolsControllerBuilder {
     
-    public static ToolsController buildStandardToolset(DrewPool drewPool, Viewport viewport, ContextSetting contextSetting) {
+    public static ToolsController buildStandardToolset(DrewPool drewPool, Eraser eraser, Viewport viewport, ContextSetting contextSetting) {
         ToolsController toolsController = new ToolsController();
         PenController penController = new PenController(drewPool, viewport);
         penController.setContext(contextSetting.getBrushContext());
-        EraserController eraserController = new EraserController(contextSetting.getEraserContext(), drewPool, viewport);
+        EraserController eraserController = new EraserController(eraser, drewPool, viewport);
         PanController panController = new PanController(viewport);
         SelectController selectController = new SelectController(drewPool, viewport);
         toolsController.addController(Tools.PEN, penController);

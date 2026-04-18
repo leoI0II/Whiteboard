@@ -1,5 +1,6 @@
 package org.view.interfaces;
 
+import org.model.base.Eraser;
 import org.model.base.Stroke;
 
 /**
@@ -12,6 +13,7 @@ public interface RendererVisitor {
      * @param stroke The Stroke object to be rendered.
      */
     public void visit(Stroke stroke);
+    public void visit(Eraser eraser);        // future implementation for rendering eraser strokes
 
     // public void visit(Text text);        // future implementation for rendering text
 }

@@ -12,6 +12,7 @@ public class ToolsController extends Controller {
     private HashMap<Tools, Controller> controllers;
     private Controller activeController;
     private List<ToolChangedObserver> toolChangedObservers = new ArrayList<>();
+    private Tools activeTool;
 
     public ToolsController() {
         controllers = new HashMap<>();
@@ -24,12 +25,17 @@ public class ToolsController extends Controller {
 
     public void setActiveTool(Tools tool) {
         activeController = controllers.get(tool);
+        activeTool = tool;
 
         notifyToolChangedObservers(tool);
     }
 
     public Controller getActiveController() {
         return activeController;
+    }
+
+    public Tools getActiveTool() {
+        return activeTool;
     }
 
     public Controller getController(Tools tool) {

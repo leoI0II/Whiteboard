@@ -192,5 +192,9 @@ public class BoundingBox {
     public void setBottomRight(final Point p) {
         setBottomRight(p.x(), p.y());
     }
+
+    public RectangleBBox toRectangle() {
+        return new RectangleBBox(topLeftX, topLeftY, bottomRightX - topLeftX, bottomRightY - topLeftY);
+    }
     
 }

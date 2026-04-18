@@ -3,8 +3,8 @@ package org.view.jfx;
 import org.Controller.ContextSetting;
 import org.model.DrewPool;
 import org.model.Viewport;
+import org.model.base.Eraser;
 import org.model.base.Stroke;
-import org.model.base.context.EraserContext;
 import org.model.interfaces.Drawable;
 import org.view.interfaces.RendererVisitor;
 
@@ -47,6 +47,10 @@ public class BoardRenderer implements RendererVisitor {
         }
     }
 
+    public void render(Eraser eraser) {
+        eraser.acceptRenderer(this);
+    }
+
     @Override
     public void visit(Stroke stroke) {
         var points = stroke.getPoints();
@@ -79,4 +83,17 @@ public class BoardRenderer implements RendererVisitor {
         gc.stroke();
     }
     
+    @Override
+    public void visit(Eraser eraser) {
+        // Implementation for rendering eraser strokes
+        // This could be a visual representation of the eraser's path, or it could be left empty if erasing is handled by removing strokes from the DrewPool
+        // For example, you could draw a semi-transparent circle at the eraser's position to indicate where the eraser is active:
+
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(10);
+        var radius = eraser.getContext().getRadius();
+        var x = eraser.getPointX();
+        var y = eraser.getPointY();
+        gc.strokeOval(x - radius, y - radius, 2 * radius, 2 * radius);
+    }
 }

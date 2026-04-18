@@ -1,15 +1,12 @@
 package org.app.jfx;
 
-import javax.naming.Context;
-
 import org.Controller.ContextSetting;
-import org.Controller.EraserController;
 import org.Controller.Tools;
 import org.Controller.ToolsController;
 import org.Controller.ToolsControllerBuilder;
 import org.model.DrewPool;
 import org.model.Viewport;
-import org.model.base.context.EraserContext;
+import org.model.base.Eraser;
 import org.view.jfx.BoardRenderer;
 import org.view.jfx.ToolBarBuilder;
 
@@ -29,6 +26,7 @@ public class MainApp extends javafx.application.Application {
     private Canvas canvas;
     private Viewport viewport;
     private DrewPool drewPool;
+    private Eraser eraser;
     private ToolsController mainToolsetController;
     private ContextSetting contextSetting = new ContextSetting();
 
@@ -36,8 +34,9 @@ public class MainApp extends javafx.application.Application {
     public void start(Stage primaryStage) throws Exception {
         this.viewport = new Viewport(0, 0, 1.0);
         this.drewPool = new DrewPool();
+        this.eraser = new Eraser(contextSetting.getEraserContext());
 
-        this.mainToolsetController = ToolsControllerBuilder.buildStandardToolset(drewPool, viewport, contextSetting);
+        this.mainToolsetController = ToolsControllerBuilder.buildStandardToolset(drewPool, eraser, viewport, contextSetting);
 
         this.renderer = new BoardRenderer(null); // GraphicsContext will be set later
         renderer.setViewport(viewport);
@@ -165,6 +164,11 @@ public class MainApp extends javafx.application.Application {
         renderer.setGraphicsContext(gc);
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         renderer.render(drewPool);
+
+        if (mainToolsetController.getActiveTool() == Tools.ERASER) {
+            // Optionally, you could render a visual representation of the eraser cursor here
+            renderer.render(eraser);
+        }
     }
 
     public static void main(String[] args) {
