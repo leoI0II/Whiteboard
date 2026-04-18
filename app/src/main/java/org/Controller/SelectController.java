@@ -14,7 +14,9 @@ public class SelectController extends Controller {
     private DrewPool itemPool;
     private Viewport viewport;
     private List<Drawable> selectedItems = new ArrayList<>();
+    private List<Drawable> contextItems = new ArrayList<>();
     double selectStartX, selectStartY;
+    double lastMouseX, lastMouseY;
 
     public SelectController(final DrewPool itemPool, final Viewport viewport) {
         this.itemPool = itemPool;
@@ -23,12 +25,13 @@ public class SelectController extends Controller {
     
     @Override
     protected void onMousePressed(double x, double y) {
-        selectStartX = x;
-        selectStartY = y;
+        selectStartX = viewport.screenToWorldX(x);
+        selectStartY = viewport.screenToWorldY(y);
+        contextItems.clear();
         selectedItems.clear();
         for (var item : itemPool.getDrewObjects()) {
             if (item instanceof Selectable) {
-                selectedItems.add(item);
+                contextItems.add(item);
             }
         }
         onMouseDragged(x, y);
@@ -36,12 +39,29 @@ public class SelectController extends Controller {
 
     @Override
     protected void onMouseDragged(double x, double y) {
+        lastMouseX = viewport.screenToWorldX(x);
+        lastMouseY = viewport.screenToWorldY(y);
 
+        for (var item : contextItems) {
+            if (item.getBoundingBox().contains(lastMouseX, lastMouseY)) {
+                if (!selectedItems.contains(item)) {
+                    selectedItems.add(item);
+                }
+            }
+        }
     }
 
     @Override
     protected void onMouseReleased(double x, double y) {
 
+    }
+
+    public List<Drawable> getSelectedItems() {
+        return selectedItems;
+    }
+
+    public void clearSelection() {
+        selectedItems.clear();
     }
     
 }

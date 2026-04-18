@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Stack;
 
 import org.model.interfaces.Drawable;
-import org.model.interfaces.HistoryObserver;
+import org.model.interfaces.observers.HistoryObserver;
 
 /**
  * The DrewPool class manages a collection of drawable objects.

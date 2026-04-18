@@ -1,13 +1,17 @@
 package org.Controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.model.interfaces.Controller;
+import org.model.interfaces.observers.ToolChangedObserver;
 
 public class ToolsController extends Controller {
     
     private HashMap<Tools, Controller> controllers;
     private Controller activeController;
+    private List<ToolChangedObserver> toolChangedObservers = new ArrayList<>();
 
     public ToolsController() {
         controllers = new HashMap<>();
@@ -20,6 +24,8 @@ public class ToolsController extends Controller {
 
     public void setActiveTool(Tools tool) {
         activeController = controllers.get(tool);
+
+        notifyToolChangedObservers(tool);
     }
 
     public Controller getActiveController() {
@@ -28,6 +34,16 @@ public class ToolsController extends Controller {
 
     public Controller getController(Tools tool) {
         return controllers.get(tool);
+    }
+
+    public void addToolChangedObserver(ToolChangedObserver observer) {
+        toolChangedObservers.add(observer);
+    }
+
+    private void notifyToolChangedObservers(Tools newTool) {
+        for (var observer : toolChangedObservers) {
+            observer.onToolChanged(newTool);
+        }
     }
 
     @Override

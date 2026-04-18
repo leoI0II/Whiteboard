@@ -14,7 +14,7 @@ import javafx.scene.layout.HBox;
 public class ToolBarBuilder {
     
     public static HBox buildToolBar(ToolsController mainController, DrewPool pool, Runnable requestRedraw) {
-
+        
         ToggleButton penButton = new ToggleButton("Pen");
         penButton.setOnAction(e -> mainController.setActiveTool(Tools.PEN));
         ToggleButton eraserButton = new ToggleButton("Eraser");

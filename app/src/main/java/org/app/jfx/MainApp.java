@@ -1,9 +1,15 @@
 package org.app.jfx;
 
+import javax.naming.Context;
+
+import org.Controller.ContextSetting;
+import org.Controller.EraserController;
+import org.Controller.Tools;
 import org.Controller.ToolsController;
 import org.Controller.ToolsControllerBuilder;
 import org.model.DrewPool;
 import org.model.Viewport;
+import org.model.base.context.EraserContext;
 import org.view.jfx.BoardRenderer;
 import org.view.jfx.ToolBarBuilder;
 
@@ -24,16 +30,18 @@ public class MainApp extends javafx.application.Application {
     private Viewport viewport;
     private DrewPool drewPool;
     private ToolsController mainToolsetController;
+    private ContextSetting contextSetting = new ContextSetting();
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         this.viewport = new Viewport(0, 0, 1.0);
         this.drewPool = new DrewPool();
 
-        this.mainToolsetController = ToolsControllerBuilder.buildStandardToolset(drewPool, viewport);
+        this.mainToolsetController = ToolsControllerBuilder.buildStandardToolset(drewPool, viewport, contextSetting);
 
         this.renderer = new BoardRenderer(null); // GraphicsContext will be set later
         renderer.setViewport(viewport);
+        renderer.setContextSetting(contextSetting);
         
         this.canvas = new Canvas(800, 600);
         Pane rootPane = new Pane(canvas);

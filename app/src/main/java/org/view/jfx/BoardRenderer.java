@@ -1,8 +1,10 @@
 package org.view.jfx;
 
+import org.Controller.ContextSetting;
 import org.model.DrewPool;
 import org.model.Viewport;
 import org.model.base.Stroke;
+import org.model.base.context.EraserContext;
 import org.model.interfaces.Drawable;
 import org.view.interfaces.RendererVisitor;
 
@@ -15,10 +17,12 @@ public class BoardRenderer implements RendererVisitor {
 
     private GraphicsContext gc;
     private Viewport viewport;
+    private ContextSetting contextSetting;
 
     public BoardRenderer() {
         this.gc = null;
         this.viewport = null;
+        this.contextSetting = null;
     }
 
     public BoardRenderer(GraphicsContext gc) {
@@ -27,6 +31,10 @@ public class BoardRenderer implements RendererVisitor {
 
     public void setGraphicsContext(GraphicsContext gc) {
         this.gc = gc;
+    }
+
+    public void setContextSetting(ContextSetting contextSetting) {
+        this.contextSetting = contextSetting;
     }
 
     public void setViewport(Viewport viewport) {
