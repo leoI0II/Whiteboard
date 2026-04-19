@@ -88,9 +88,9 @@ public class BoardRenderer implements RendererVisitor {
         // Implementation for rendering eraser strokes
         // This could be a visual representation of the eraser's path, or it could be left empty if erasing is handled by removing strokes from the DrewPool
         // For example, you could draw a semi-transparent circle at the eraser's position to indicate where the eraser is active:
-
+        
         gc.setStroke(Color.BLACK);
-        gc.setLineWidth(10);
+        gc.setLineWidth(1);
         var radius = eraser.getContext().getRadius();
         var x = eraser.getPointX();
         var y = eraser.getPointY();

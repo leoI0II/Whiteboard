@@ -10,6 +10,7 @@ import org.model.base.Eraser;
 import org.view.jfx.BoardRenderer;
 import org.view.jfx.ToolBarBuilder;
 
+import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.input.KeyCode;
@@ -38,6 +39,9 @@ public class MainApp extends javafx.application.Application {
         this.eraser = new Eraser(contextSetting.getEraserContext());
 
         this.mainToolsetController = ToolsControllerBuilder.buildStandardToolset(drewPool, eraser, viewport, contextSetting);
+        this.mainToolsetController.addToolChangedObserver(tool -> {
+            mainCanvas.setCursor(tool == Tools.ERASER ? Cursor.NONE : Cursor.DEFAULT);
+        });
 
         this.renderer = new BoardRenderer(null); // GraphicsContext will be set later
         renderer.setViewport(viewport);
