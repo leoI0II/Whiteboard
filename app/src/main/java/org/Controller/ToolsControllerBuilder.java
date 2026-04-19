@@ -18,11 +18,8 @@ public class ToolsControllerBuilder {
         toolsController.addController(Tools.HAND, panController);
         toolsController.addController(Tools.SELECTION, selectController);
         toolsController.setActiveTool(Tools.DEFAULT_TOOL);
-
-        toolsController.addToolChangedObserver((tool) -> {
-            System.out.println("Active tool changed to: " + tool);
-
-            if (toolsController.getActiveController() != selectController) {
+        toolsController.addToolChangedObserver(tool -> {
+            if (tool != Tools.SELECTION) {
                 selectController.clearSelection();
             }
         });
