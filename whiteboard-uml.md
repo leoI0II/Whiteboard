@@ -291,4 +291,35 @@ classDiagram
     class ToolBarBuilder {
         +HBox buildToolBar(ToolsController, DrewPool, Runnable)$
     }
+
+    %% ── App wiring ───────────────────────────────────────────
+
+    class WhiteboardSession {
+        -Canvas mainCanvas
+        -Canvas cursorCanvas
+        -DrewPool drewPool
+        -Viewport viewport
+        -Eraser eraser
+        -ToolsController toolsController
+        -BoardRenderer renderer
+        +void setup(Scene)
+        +HBox buildToolBar()
+        -void setupObservers()
+        -void setupMouseEvents()
+        -void setupGestures()
+        -void setupKeyboardShortcuts(Scene)
+        -void redrawCanvas()
+        -void redrawCursorCanvas()
+    }
+    WhiteboardSession *-- DrewPool
+    WhiteboardSession *-- Viewport
+    WhiteboardSession *-- Eraser
+    WhiteboardSession *-- ToolsController
+    WhiteboardSession *-- BoardRenderer
+
+    class MainApp {
+        +void start(Stage)
+        +void main(String[])$
+    }
+    MainApp ..> WhiteboardSession
 ```
