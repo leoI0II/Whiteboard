@@ -27,6 +27,9 @@ public class WhiteboardSession {
     private final Eraser eraser;
     private final ToolsController toolsController;
     private final BoardRenderer renderer;
+    private Runnable cursorRendererRunnable = () -> {};
+
+    private static final Runnable NO_CURSOR_RENDERER = () -> {};
 
     public WhiteboardSession(Canvas mainCanvas, Canvas cursorCanvas) {
         this.mainCanvas = mainCanvas;
@@ -58,7 +61,17 @@ public class WhiteboardSession {
 
     private void setupObservers() {
         toolsController.addToolChangedObserver(tool -> {
-            mainCanvas.setCursor(tool == Tools.ERASER ? Cursor.NONE : Cursor.DEFAULT);
+            if (tool == Tools.ERASER) {
+                mainCanvas.setCursor(Cursor.NONE);
+                cursorRendererRunnable = () -> renderer.render(eraser);
+            }
+            else if (tool == Tools.HAND) {
+                mainCanvas.setCursor(Cursor.OPEN_HAND);
+                cursorRendererRunnable = NO_CURSOR_RENDERER;
+            } else {
+                mainCanvas.setCursor(Cursor.DEFAULT);
+                cursorRendererRunnable = NO_CURSOR_RENDERER;
+            }
         });
     }
 
@@ -68,15 +81,26 @@ public class WhiteboardSession {
             redrawCursorCanvas();
         });
         mainCanvas.setOnMousePressed(event -> {
+            if (toolsController.getActiveTool() == Tools.HAND) {
+                mainCanvas.setCursor(Cursor.CLOSED_HAND);
+            }
+
             toolsController.handleMousePressed(event.getX(), event.getY());
             redrawCanvas();
         });
         mainCanvas.setOnMouseDragged(event -> {
+            if (toolsController.getActiveTool() == Tools.HAND) {
+                mainCanvas.setCursor(Cursor.CLOSED_HAND);
+            }
             toolsController.handleMouseDragged(event.getX(), event.getY());
             redrawCanvas();
             redrawCursorCanvas();
         });
         mainCanvas.setOnMouseReleased(event -> {
+            if (toolsController.getActiveTool() == Tools.HAND) {
+                mainCanvas.setCursor(Cursor.OPEN_HAND);
+            }
+
             toolsController.handleMouseReleased(event.getX(), event.getY());
             redrawCanvas();
         });
@@ -131,8 +155,6 @@ public class WhiteboardSession {
         var gc = cursorCanvas.getGraphicsContext2D();
         renderer.setGraphicsContext(gc);
         gc.clearRect(0, 0, cursorCanvas.getWidth(), cursorCanvas.getHeight());
-        if (toolsController.getActiveTool() == Tools.ERASER) {
-            renderer.render(eraser);
-        }
+        cursorRendererRunnable.run();
     }
 }
