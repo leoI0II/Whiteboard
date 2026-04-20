@@ -1,15 +1,19 @@
 package org.view.jfx;
 
+import java.util.List;
+
 import org.Controller.ContextSetting;
 import org.model.DrewPool;
 import org.model.Viewport;
 import org.model.base.Eraser;
 import org.model.base.Stroke;
 import org.model.interfaces.Drawable;
+import org.model.utils.RectangleBBox;
 import org.view.interfaces.RendererVisitor;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
 
@@ -49,6 +53,31 @@ public class BoardRenderer implements RendererVisitor {
 
     public void render(Eraser eraser) {
         eraser.acceptRenderer(this);
+    }
+
+    public void renderSelectionBox(final RectangleBBox selectionBox) {
+        gc.setStroke(Color.BLUE);
+        gc.setLineWidth(1);
+        gc.setLineDashes(5);
+        var x = viewport.worldToScreenX(selectionBox.getX());
+        var y = viewport.worldToScreenY(selectionBox.getY());
+        var w = selectionBox.getWidth() * viewport.getZoom();
+        var h = selectionBox.getHeight() * viewport.getZoom();
+        gc.strokeRect(x, y, w, h);
+        gc.setLineDashes(0); // Сбросить стиль линий
+    }
+
+    public void renderSelectedItemHighlight(List<Drawable> selectedItems) {
+        for (var item : selectedItems) {
+            var bbox = item.getBoundingBox();
+            gc.setStroke(Color.BLUE);
+            gc.setLineWidth(2);
+            var x = viewport.worldToScreenX(bbox.getTopLeftX());
+            var y = viewport.worldToScreenY(bbox.getTopLeftY());
+            var w = viewport.worldToScreenX(bbox.getBottomRightX()) - x;
+            var h = viewport.worldToScreenY(bbox.getBottomRightY()) - y;
+            gc.strokeRect(x, y, w, h);
+        }
     }
 
     @Override

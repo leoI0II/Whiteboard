@@ -1,6 +1,7 @@
 package org.app.jfx;
 
 import org.Controller.ContextSetting;
+import org.Controller.SelectController;
 import org.Controller.Tools;
 import org.Controller.ToolsController;
 import org.Controller.ToolsControllerBuilder;
@@ -20,6 +21,8 @@ import javafx.scene.layout.HBox;
 
 public class WhiteboardSession {
 
+    private static final Runnable NO_RENDERER = () -> {};
+
     private final Canvas mainCanvas;
     private final Canvas cursorCanvas;
     private final DrewPool drewPool;
@@ -27,9 +30,8 @@ public class WhiteboardSession {
     private final Eraser eraser;
     private final ToolsController toolsController;
     private final BoardRenderer renderer;
-    private Runnable cursorRendererRunnable = () -> {};
-
-    private static final Runnable NO_CURSOR_RENDERER = () -> {};
+    private Runnable cursorRendererRunnable = NO_RENDERER;
+    private Runnable selectionRendererRunnable = NO_RENDERER;
 
     public WhiteboardSession(Canvas mainCanvas, Canvas cursorCanvas) {
         this.mainCanvas = mainCanvas;
@@ -61,16 +63,22 @@ public class WhiteboardSession {
 
     private void setupObservers() {
         toolsController.addToolChangedObserver(tool -> {
+            selectionRendererRunnable = NO_RENDERER;
+            mainCanvas.setCursor(Cursor.DEFAULT);
+            cursorRendererRunnable = NO_RENDERER;
             if (tool == Tools.ERASER) {
                 mainCanvas.setCursor(Cursor.NONE);
                 cursorRendererRunnable = () -> renderer.render(eraser);
-            }
-            else if (tool == Tools.HAND) {
+            } else if (tool == Tools.HAND) {
                 mainCanvas.setCursor(Cursor.OPEN_HAND);
-                cursorRendererRunnable = NO_CURSOR_RENDERER;
-            } else {
-                mainCanvas.setCursor(Cursor.DEFAULT);
-                cursorRendererRunnable = NO_CURSOR_RENDERER;
+                cursorRendererRunnable = NO_RENDERER;
+            } else if (tool == Tools.SELECTION) {
+                mainCanvas.setCursor(Cursor.CROSSHAIR);
+                cursorRendererRunnable = NO_RENDERER;
+                SelectController selectController = (SelectController) toolsController.getActiveController();
+                selectionRendererRunnable = () -> {
+                    redrawSelection(selectController);
+                };
             }
         });
     }
@@ -149,6 +157,8 @@ public class WhiteboardSession {
         renderer.setGraphicsContext(gc);
         gc.clearRect(0, 0, mainCanvas.getWidth(), mainCanvas.getHeight());
         renderer.render(drewPool);
+        
+        selectionRendererRunnable.run();
     }
 
     private void redrawCursorCanvas() {
@@ -156,5 +166,16 @@ public class WhiteboardSession {
         renderer.setGraphicsContext(gc);
         gc.clearRect(0, 0, cursorCanvas.getWidth(), cursorCanvas.getHeight());
         cursorRendererRunnable.run();
+    }
+
+    private void redrawSelection(SelectController selectController) {
+        // Implement selection rendering logic here, if needed
+        if (selectController.getSelectionBox() != null) {
+            renderer.renderSelectionBox(selectController.getSelectionBox());
+        }
+        if (selectController.getSelectedItems() != null) {
+            // You can implement a visual indication for selected items here, such as drawing a bounding box around them
+            renderer.renderSelectedItemHighlight(selectController.getSelectedItems());
+        }
     }
 }

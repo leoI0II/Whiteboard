@@ -31,6 +31,21 @@ public class RectangleBBox {
     }
 
     /**
+     * Sets the position and dimensions of the rectangle.
+     *
+     * @param x      The x-coordinate of the top-left corner.
+     * @param y      The y-coordinate of the top-left corner.
+     * @param width  The width of the rectangle.
+     * @param height The height of the rectangle.
+     */
+    public void set(double x, double y, double width, double height) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+    }
+
+    /**
      * Construct an axis aligned Bounding Box from the original rectangle.
      * 
      * @return BoundingBox.
