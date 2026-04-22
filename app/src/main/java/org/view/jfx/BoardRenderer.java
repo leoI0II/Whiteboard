@@ -8,6 +8,7 @@ import org.model.Viewport;
 import org.model.base.Eraser;
 import org.model.base.Stroke;
 import org.model.interfaces.Drawable;
+import org.model.interfaces.Selectable;
 import org.model.utils.RectangleBBox;
 import org.view.interfaces.RendererVisitor;
 
@@ -67,7 +68,7 @@ public class BoardRenderer implements RendererVisitor {
         gc.setLineDashes(0); // Сбросить стиль линий
     }
 
-    public void renderSelectedItemHighlight(List<Drawable> selectedItems) {
+    public void renderSelectedItemHighlight(List<Selectable> selectedItems) {
         for (var item : selectedItems) {
             var bbox = item.getBoundingBox();
             gc.setStroke(Color.BLUE);

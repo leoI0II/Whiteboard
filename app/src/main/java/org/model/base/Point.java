@@ -40,6 +40,10 @@ public record Point(double x, double y) {
         return new Point(x + other.x, y + other.y);
     }
 
+    public Point add(double deltaX, double deltaY) {
+        return new Point(x + deltaX, y + deltaY);
+    }
+
     /**
      * Subtracts the coordinates of another point from this point.
      *

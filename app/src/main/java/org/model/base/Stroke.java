@@ -9,6 +9,7 @@ import org.model.interfaces.Drawable;
 import org.model.interfaces.Erasable;
 import org.model.interfaces.Selectable;
 import org.model.utils.BoundingBox;
+import org.model.utils.RectangleBBox;
 import org.view.interfaces.RendererVisitor;
 
 /**
@@ -188,6 +189,53 @@ public class Stroke implements Drawable, Erasable, Selectable {
     @Override
     public void acceptRenderer(RendererVisitor visitor) {
         visitor.visit(this);
+    }
+
+    @Override
+    public void move(double deltaX, double deltaY) {
+        
+        for (int i = 0; i < points.size(); i++) {
+            points.set(i, points.get(i).add(deltaX, deltaY));
+        }
+        // Обновляем bounding box
+        boundingBox.setTopLeft(boundingBox.getTopLeft().add(deltaX, deltaY));
+        boundingBox.setBottomRight(boundingBox.getBottomRight().add(deltaX, deltaY));
+    }
+
+    @Override
+    public boolean intersects(RectangleBBox selectionBox) {
+        if (!boundingBox.intersects(selectionBox.toBoundingBox())) return false;
+
+        for (Point p : points) {
+            if (selectionBox.contains(p)) return true;
+        }
+
+        double x1 = selectionBox.getX();
+        double y1 = selectionBox.getY();
+        double x2 = x1 + selectionBox.getWidth();
+        double y2 = y1 + selectionBox.getHeight();
+
+        for (int i = 0; i < points.size() - 1; i++) {
+            Point a = points.get(i);
+            Point b = points.get(i + 1);
+            if (segmentIntersectsSegment(a, b, x1, y1, x2, y1) ||
+                segmentIntersectsSegment(a, b, x1, y2, x2, y2) ||
+                segmentIntersectsSegment(a, b, x1, y1, x1, y2) ||
+                segmentIntersectsSegment(a, b, x2, y1, x2, y2)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean segmentIntersectsSegment(Point a, Point b, double cx, double cy, double dx, double dy) {
+        double abx = b.x() - a.x(), aby = b.y() - a.y();
+        double cdx = dx - cx,       cdy = dy - cy;
+        double denom = abx * cdy - aby * cdx;
+        if (denom == 0) return false;
+        double t = ((cx - a.x()) * cdy - (cy - a.y()) * cdx) / denom;
+        double u = ((cx - a.x()) * aby - (cy - a.y()) * abx) / denom;
+        return t >= 0 && t <= 1 && u >= 0 && u <= 1;
     }
     
 }
