@@ -18,6 +18,7 @@ public class SelectController extends Controller {
     double selectStartX, selectStartY;
     double lastMouseX, lastMouseY;
     private RectangleBBox selectionBox;
+    private boolean isMovingSelectedItems = false;
 
     public SelectController(final DrewPool itemPool, final Viewport viewport) {
         this.itemPool = itemPool;
@@ -35,19 +36,38 @@ public class SelectController extends Controller {
     public RectangleBBox getSelectionBox() {
         return selectionBox;
     }
-    
-    @Override
-    protected void onMousePressed(double x, double y) {
-        selectStartX = viewport.screenToWorldX(x);
-        selectStartY = viewport.screenToWorldY(y);
-        contextItems.clear();
+
+    private boolean checkPreviouslySelected() {
+        for (var previouslySelected : selectedItems) {
+            if (previouslySelected.getBoundingBox().contains(selectStartX, selectStartY)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void initializeSelectionContext() {
         selectedItems.clear();
+        contextItems.clear();
         selectionBox = new RectangleBBox();
         for (var item : itemPool.getDrewObjects()) {
             if (item instanceof Selectable) {
                 contextItems.add((Selectable)item);
             }
         }
+    }
+    
+    @Override
+    protected void onMousePressed(double x, double y) {
+        selectStartX = viewport.screenToWorldX(x);
+        selectStartY = viewport.screenToWorldY(y);
+        lastMouseX = selectStartX;
+        lastMouseY = selectStartY;
+        if (checkPreviouslySelected()) {
+            isMovingSelectedItems = true;
+        }
+        if (!isMovingSelectedItems)
+            initializeSelectionContext();
         onMouseDragged(x, y);
     }
 
@@ -55,13 +75,13 @@ public class SelectController extends Controller {
         return item.intersects(selectionBox);
     }
 
-    @Override
-    protected void onMouseDragged(double x, double y) {
-        lastMouseX = viewport.screenToWorldX(x);
-        lastMouseY = viewport.screenToWorldY(y);
+    private void onMovingMouseDragged(double deltaX, double deltaY) {
+        for (var item : selectedItems) {
+            item.move(deltaX, deltaY);
+        }
+    }
 
-        updateSelectionBox();
-
+    private void onSelectionMouseDragged() {
         for (var item : contextItems) {
             if (checkIntersection(item)) {
                 if (!selectedItems.contains(item)) selectedItems.add(item);
@@ -72,16 +92,27 @@ public class SelectController extends Controller {
     }
 
     @Override
-    protected void onMouseReleased(double x, double y) {
-        // for (var item : contextItems) {
-        //     if (selectionBox.intersects(item.getBoundingBox())) {
-        //         if (!selectedItems.contains(item)) {
-        //             selectedItems.add(item);
-        //         }
-        //     }
-        // }
+    protected void onMouseDragged(double x, double y) {
+        double deltaX = viewport.screenToWorldX(x) - lastMouseX;
+        double deltaY = viewport.screenToWorldY(y) - lastMouseY;
+
+        lastMouseX = viewport.screenToWorldX(x);
+        lastMouseY = viewport.screenToWorldY(y);
         
+        if (isMovingSelectedItems)
+            onMovingMouseDragged(deltaX, deltaY);
+        else
+        {
+            updateSelectionBox();
+            onSelectionMouseDragged();
+        }
+    }
+
+    @Override
+    protected void onMouseReleased(double x, double y) {        
         selectionBox = null;
+        isMovingSelectedItems = false;
+        contextItems.clear();
     }
 
     public List<Selectable> getSelectedItems() {

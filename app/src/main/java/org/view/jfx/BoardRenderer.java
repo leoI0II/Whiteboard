@@ -73,10 +73,11 @@ public class BoardRenderer implements RendererVisitor {
             var bbox = item.getBoundingBox();
             gc.setStroke(Color.BLUE);
             gc.setLineWidth(2);
-            var x = viewport.worldToScreenX(bbox.getTopLeftX());
-            var y = viewport.worldToScreenY(bbox.getTopLeftY());
-            var w = viewport.worldToScreenX(bbox.getBottomRightX()) - x;
-            var h = viewport.worldToScreenY(bbox.getBottomRightY()) - y;
+            var halfThickness = contextSetting.getBrushContext().getThickness() / 2.0;
+            var x = viewport.worldToScreenX(bbox.getTopLeftX() - halfThickness);
+            var y = viewport.worldToScreenY(bbox.getTopLeftY() - halfThickness);
+            var w = viewport.worldToScreenX(bbox.getBottomRightX() + halfThickness) - x;
+            var h = viewport.worldToScreenY(bbox.getBottomRightY() + halfThickness) - y;
             gc.strokeRect(x, y, w, h);
         }
     }
