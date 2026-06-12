@@ -1,299 +1,17 @@
+# Whiteboard — Class Diagram (Mermaid)
+
 ```mermaid
 classDiagram
-
-    %% ── Interfaces ───────────────────────────────────────────
-
-    class Drawable {
-        <<interface>>
-        +BoundingBox getBoundingBox()
-        +void acceptRenderer(RendererVisitor)
+    %% ─────────────────────────────────────────────────────────────────────
+    %% ENTRY POINT
+    %% ─────────────────────────────────────────────────────────────────────
+    class Launcher {
+        +main(String[])
     }
-    class Erasable {
-        <<interface>>
-        +boolean intersectsEraser(double, double, double)
+    class MainApp {
+        +start(Stage)
+        +main(String[])$
     }
-    class Selectable {
-        <<interface>>
-    }
-    class Controller {
-        <<abstract>>
-        #boolean isPressed
-        #double lastX
-        #double lastY
-        +void handleMouseMoved(double, double)
-        +void handleMousePressed(double, double)
-        +void handleMouseDragged(double, double)
-        +void handleMouseReleased(double, double)
-        +boolean isPressed()
-        #void onMouseMoved(double, double)*
-        #void onMousePressed(double, double)*
-        #void onMouseDragged(double, double)*
-        #void onMouseReleased(double, double)*
-    }
-    class RendererVisitor {
-        <<interface>>
-        +void visit(Stroke)
-        +void visit(Eraser)
-    }
-    class HistoryObserver {
-        <<interface>>
-        +void onHistoryChanged(boolean canUndo, boolean canRedo)
-    }
-    class ToolChangedObserver {
-        <<interface>>
-        +void onToolChanged(Tools newTool)
-    }
-
-    %% ── Value objects ────────────────────────────────────────
-
-    class ARGBColor {
-        <<record>>
-        +int alpha
-        +int red
-        +int green
-        +int blue
-        +ARGBColor(int, int, int)
-        +ARGBColor(int argb)
-        +ARGBColor(String hex)
-        +String toHexString()
-    }
-    class Point {
-        <<record>>
-        +double x
-        +double y
-        +Point multiply(double)
-        +Point divide(double)
-        +Point add(Point)
-        +Point subtract(Point)
-    }
-    class BoundingBox {
-        -double topLeftX
-        -double topLeftY
-        -double bottomRightX
-        -double bottomRightY
-        +boolean intersects(BoundingBox)
-        +boolean contains(double, double)
-        +boolean contains(Point)
-        +Point getTopLeft()
-        +Point getBottomRight()
-        +RectangleBBox toRectangle()
-    }
-    BoundingBox ..> RectangleBBox
-
-    class RectangleBBox {
-        -double x
-        -double y
-        -double width
-        -double height
-        +BoundingBox toBoundingBox()
-        +boolean intersects(BoundingBox)
-        +boolean contains(Point)
-    }
-    RectangleBBox ..> BoundingBox
-
-    %% ── Context ──────────────────────────────────────────────
-
-    class BrushContext {
-        -double thickness
-        -ARGBColor color
-        +BrushContext(double, ARGBColor)
-        +BrushContext(BrushContext)
-        +BrushContext getContext()
-        +double getThickness()
-        +void setThickness(double)
-        +ARGBColor getColor()
-        +void setColor(ARGBColor)
-    }
-    BrushContext *-- ARGBColor
-
-    class EraserContext {
-        -double radius
-        +double getRadius()
-        +void setRadius(double)
-        +BoundingBox getBoundingBox(double, double)
-    }
-
-    class ContextSetting {
-        +BrushContext getBrushContext()
-        +EraserContext getEraserContext()
-    }
-    ContextSetting *-- BrushContext
-    ContextSetting *-- EraserContext
-
-    %% ── Drawables ────────────────────────────────────────────
-
-    class Stroke {
-        -List~Point~ points
-        -BrushContext context
-        -BoundingBox boundingBox
-        +void addPoint(Point)
-        +List~Point~ getPoints()
-        +BoundingBox getBoundingBox()
-        +BrushContext getContext()
-        +double getThickness()
-        +void setThickness(float)
-        +ARGBColor getColor()
-        +void setColor(ARGBColor)
-        +boolean intersectsEraser(double, double, double)
-        +void acceptRenderer(RendererVisitor)
-    }
-    Stroke ..|> Drawable
-    Stroke ..|> Erasable
-    Stroke ..|> Selectable
-    Stroke *-- BrushContext
-    Stroke *-- BoundingBox
-
-    class Eraser {
-        -double pointX
-        -double pointY
-        -EraserContext context
-        +EraserContext getContext()
-        +double getPointX()
-        +double getPointY()
-        +void setPoint(double, double)
-        +BoundingBox getBoundingBox()
-        +void acceptRenderer(RendererVisitor)
-    }
-    Eraser ..|> Drawable
-    Eraser *-- EraserContext
-
-    %% ── Model ────────────────────────────────────────────────
-
-    class DrewPool {
-        -Stack~Drawable~ drewObjects
-        -Stack~Drawable~ temporaryRemovedDrawables
-        +void addObserver(HistoryObserver)
-        +List~Drawable~ getDrewObjects()
-        +void addObject(Drawable)
-        +void removeObject(Drawable)
-        +void clear()
-        +void undo()
-        +void redo()
-    }
-    DrewPool o-- Drawable
-    DrewPool o-- HistoryObserver
-
-    class Viewport {
-        -double offsetX
-        -double offsetY
-        -double zoom
-        +void setOffset(double, double)
-        +Point getOffset()
-        +double getZoom()
-        +void setZoom(double)
-        +double screenToWorldX(double)
-        +double screenToWorldY(double)
-        +Point screenToWorld(double, double)
-        +double worldToScreenX(double)
-        +double worldToScreenY(double)
-        +Point worldToScreen(double, double)
-        +double getZoomedThickness(double)
-    }
-    Viewport ..> Point
-
-    %% ── Controllers ──────────────────────────────────────────
-
-    class Tools {
-        <<enum>>
-        PEN
-        ERASER
-        SHAPE
-        SELECTION
-        TEXT
-        COLOR_PICKER
-        ZOOM
-        HAND
-        DEFAULT_TOOL$
-    }
-
-    class ToolsController {
-        -HashMap~Tools, Controller~ controllers
-        -Controller activeController
-        -Tools activeTool
-        +void addController(Tools, Controller)
-        +void setActiveTool(Tools)
-        +Controller getActiveController()
-        +Tools getActiveTool()
-        +Controller getController(Tools)
-        +void addToolChangedObserver(ToolChangedObserver)
-    }
-    ToolsController --|> Controller
-    ToolsController o-- Controller
-    ToolsController o-- ToolChangedObserver
-
-    class ToolsControllerBuilder {
-        +ToolsController buildStandardToolset(DrewPool, Eraser, Viewport, ContextSetting)$
-    }
-
-    class PenController {
-        -Stroke currentStroke
-        -DrewPool strokePool
-        -Viewport viewport
-        -BrushContext context
-        +void setContext(BrushContext)
-        +void setViewport(Viewport)
-        +void setStrokePool(DrewPool)
-    }
-    PenController --|> Controller
-    PenController o-- DrewPool
-    PenController o-- Viewport
-    PenController o-- BrushContext
-    PenController ..> Stroke
-
-    class EraserController {
-        -DrewPool itemPool
-        -Eraser eraser
-        -List~Drawable~ contextItems
-        -Viewport viewport
-        +void setItemPool(DrewPool)
-        +void setViewport(Viewport)
-    }
-    EraserController --|> Controller
-    EraserController o-- Eraser
-    EraserController o-- DrewPool
-    EraserController o-- Viewport
-
-    class PanController {
-        -Viewport viewport
-    }
-    PanController --|> Controller
-    PanController o-- Viewport
-
-    class SelectController {
-        -DrewPool itemPool
-        -Viewport viewport
-        -List~Drawable~ selectedItems
-        +List~Drawable~ getSelectedItems()
-        +void clearSelection()
-    }
-    SelectController --|> Controller
-    SelectController o-- DrewPool
-    SelectController o-- Viewport
-
-    %% ── View ─────────────────────────────────────────────────
-
-    class BoardRenderer {
-        -GraphicsContext gc
-        -Viewport viewport
-        -ContextSetting contextSetting
-        +void setGraphicsContext(GraphicsContext)
-        +void setViewport(Viewport)
-        +void setContextSetting(ContextSetting)
-        +void render(DrewPool)
-        +void render(Eraser)
-        +void visit(Stroke)
-        +void visit(Eraser)
-    }
-    BoardRenderer ..|> RendererVisitor
-    BoardRenderer o-- Viewport
-    BoardRenderer o-- ContextSetting
-
-    class ToolBarBuilder {
-        +HBox buildToolBar(ToolsController, DrewPool, Runnable)$
-    }
-
-    %% ── App wiring ───────────────────────────────────────────
-
     class WhiteboardSession {
         -Canvas mainCanvas
         -Canvas cursorCanvas
@@ -302,24 +20,430 @@ classDiagram
         -Eraser eraser
         -ToolsController toolsController
         -BoardRenderer renderer
-        +void setup(Scene)
-        +HBox buildToolBar()
-        -void setupObservers()
-        -void setupMouseEvents()
-        -void setupGestures()
-        -void setupKeyboardShortcuts(Scene)
-        -void redrawCanvas()
-        -void redrawCursorCanvas()
+        -Runnable cursorRendererRunnable
+        -Runnable selectionRendererRunnable
+        +WhiteboardSession(Canvas, Canvas)
+        +setup(Scene)
+        +buildToolBar() HBox
+        -setupObservers()
+        -setupMouseEvents()
+        -setupGestures()
+        -setupKeyboardShortcuts(Scene)
+        -redrawCanvas()
+        -redrawCursorCanvas()
+        -redrawSelection(SelectController)
     }
+
+    Launcher --> MainApp : delegates main()
+    MainApp --> WhiteboardSession : creates & wires
+
+    %% ─────────────────────────────────────────────────────────────────────
+    %% MODEL — CORE
+    %% ─────────────────────────────────────────────────────────────────────
+    class DrewPool {
+        -Stack~Drawable~ drewObjects
+        -Stack~Drawable~ temporaryRemovedDrawables
+        -List~HistoryObserver~ historyObservers
+        +addObject(Drawable)
+        +removeObject(Drawable)
+        +clear()
+        +undo()
+        +redo()
+        +getDrewObjects() List~Drawable~
+        +getTemporaryRemovedDrawables() List~Drawable~
+        +addObserver(HistoryObserver)
+        -notifyHistoryObservers()
+    }
+
+    class Viewport {
+        -double offsetX
+        -double offsetY
+        -double zoom
+        +screenToWorldX(double) double
+        +screenToWorldY(double) double
+        +screenToWorld(double, double) Point
+        +worldToScreenX(double) double
+        +worldToScreenY(double) double
+        +worldToScreen(double, double) Point
+        +getZoomedThickness(double) double
+        +setOffset(double, double)
+        +setZoom(double)
+        +getZoom() double
+        +getOffsetX() double
+        +getOffsetY() double
+        +getOffset() Point
+    }
+
+    %% ─────────────────────────────────────────────────────────────────────
+    %% MODEL — VALUE OBJECTS
+    %% ─────────────────────────────────────────────────────────────────────
+    class Point {
+        <<record>>
+        +double x
+        +double y
+        +multiply(double) Point
+        +divide(double) Point
+        +add(Point) Point
+        +add(double, double) Point
+        +subtract(Point) Point
+    }
+
+    class ARGBColor {
+        <<record>>
+        +int alpha
+        +int red
+        +int green
+        +int blue
+        +BLACK$ ARGBColor
+        +WHITE$ ARGBColor
+        +RED$ ARGBColor
+        +ARGBColor(int red, int green, int blue)
+        +ARGBColor(int argb)
+        +ARGBColor(String hex)
+        +toHexString() String
+    }
+
+    %% ─────────────────────────────────────────────────────────────────────
+    %% MODEL — CONTEXT OBJECTS
+    %% ─────────────────────────────────────────────────────────────────────
+    class BrushContext {
+        -double thickness
+        -ARGBColor color
+        -DEFAULT_THICKNESS$ double = 10
+        -DEFAULT_COLOR$ ARGBColor = BLACK
+        +BrushContext()
+        +BrushContext(double, ARGBColor)
+        +BrushContext(BrushContext)
+        +getThickness() double
+        +setThickness(double)
+        +getColor() ARGBColor
+        +setColor(ARGBColor)
+        +getContext() BrushContext
+    }
+
+    class EraserContext {
+        -double radius
+        -DEFAULT_RADIUS$ double = 5
+        +EraserContext()
+        +EraserContext(double)
+        +getRadius() double
+        +setRadius(double)
+        +getBoundingBox(double, double) BoundingBox
+    }
+
+    class ContextSetting {
+        -BrushContext brushContext
+        -EraserContext eraserContext
+        +getBrushContext() BrushContext
+        +getEraserContext() EraserContext
+    }
+
+    BrushContext *-- ARGBColor
+    ContextSetting *-- BrushContext
+    ContextSetting *-- EraserContext
+
+    %% ─────────────────────────────────────────────────────────────────────
+    %% MODEL — UTILS
+    %% ─────────────────────────────────────────────────────────────────────
+    class BoundingBox {
+        -double topLeftX
+        -double topLeftY
+        -double bottomRightX
+        -double bottomRightY
+        +BoundingBox()
+        +BoundingBox(double, double, double, double)
+        +BoundingBox(Point, Point)
+        +intersects(BoundingBox) boolean
+        +contains(double, double) boolean
+        +contains(Point) boolean
+        +getTopLeft() Point
+        +getBottomRight() Point
+        +setTopLeft(Point)
+        +setBottomRight(Point)
+        +toRectangle() RectangleBBox
+    }
+
+    class RectangleBBox {
+        -double x
+        -double y
+        -double width
+        -double height
+        +RectangleBBox()
+        +RectangleBBox(double, double, double, double)
+        +set(double, double, double, double)
+        +toBoundingBox() BoundingBox
+        +intersects(BoundingBox) boolean
+        +intersects(RectangleBBox) boolean
+        +contains(double, double) boolean
+        +contains(Point) boolean
+        +getX() double
+        +getY() double
+        +getWidth() double
+        +getHeight() double
+    }
+
+    RectangleBBox ..> BoundingBox : converts to/from
+
+    %% ─────────────────────────────────────────────────────────────────────
+    %% INTERFACES
+    %% ─────────────────────────────────────────────────────────────────────
+    class Drawable {
+        <<interface>>
+        +getBoundingBox() BoundingBox
+        +acceptRenderer(RendererVisitor)
+    }
+
+    class Erasable {
+        <<interface>>
+        +intersectsEraser(double cx, double cy, double radius) boolean
+    }
+
+    class Selectable {
+        <<interface>>
+        +getBoundingBox() BoundingBox
+        +intersects(RectangleBBox) boolean
+        +move(double deltaX, double deltaY)
+    }
+
+    class HistoryObserver {
+        <<interface>>
+        +onHistoryChanged(boolean canUndo, boolean canRedo)
+    }
+
+    class ToolChangedObserver {
+        <<interface>>
+        +onToolChanged(Tools newTool)
+    }
+
+    class RendererVisitor {
+        <<interface>>
+        +visit(Stroke)
+        +visit(Eraser)
+    }
+
+    %% ─────────────────────────────────────────────────────────────────────
+    %% MODEL — DRAWABLE OBJECTS
+    %% ─────────────────────────────────────────────────────────────────────
+    class Stroke {
+        -List~Point~ points
+        -BrushContext context
+        -BoundingBox boundingBox
+        +Stroke(BrushContext)
+        +Stroke(double thickness, ARGBColor)
+        +Stroke(List~Point~)
+        +addPoint(Point)
+        +getPoints() List~Point~
+        +getBoundingBox() BoundingBox
+        +getContext() BrushContext
+        +getThickness() double
+        +getColor() ARGBColor
+        +intersectsEraser(double, double, double) boolean
+        +intersects(RectangleBBox) boolean
+        +move(double, double)
+        +acceptRenderer(RendererVisitor)
+        -updateBoundingBox(Point)
+        -lineIntersectsCircle(Point, Point, double, double, double) boolean
+        -segmentIntersectsSegment(Point, Point, double, double, double, double) boolean
+    }
+
+    class Eraser {
+        -double pointX
+        -double pointY
+        -EraserContext context
+        +Eraser(EraserContext)
+        +setPoint(double, double)
+        +getPointX() double
+        +getPointY() double
+        +getContext() EraserContext
+        +getBoundingBox() BoundingBox
+        +acceptRenderer(RendererVisitor)
+    }
+
+    Stroke ..|> Drawable
+    Stroke ..|> Erasable
+    Stroke ..|> Selectable
+    Stroke *-- BrushContext
+    Stroke *-- BoundingBox
+
+    Eraser ..|> Drawable
+    Eraser *-- EraserContext
+
+    DrewPool o-- Drawable
+    DrewPool o-- HistoryObserver
+
+    %% ─────────────────────────────────────────────────────────────────────
+    %% CONTROLLER — ABSTRACT (Template Method)
+    %% ─────────────────────────────────────────────────────────────────────
+    class Controller {
+        <<abstract>>
+        #boolean isPressed
+        #double lastX
+        #double lastY
+        +handleMousePressed(double, double)
+        +handleMouseDragged(double, double)
+        +handleMouseReleased(double, double)
+        +handleMouseMoved(double, double)
+        +isPressed() boolean
+        #onMousePressed(double, double)*
+        #onMouseDragged(double, double)*
+        #onMouseReleased(double, double)*
+        #onMouseMoved(double, double)*
+    }
+
+    %% ─────────────────────────────────────────────────────────────────────
+    %% CONTROLLER — CONCRETE
+    %% ─────────────────────────────────────────────────────────────────────
+    class ToolsController {
+        -HashMap~Tools,Controller~ controllers
+        -Controller activeController
+        -List~ToolChangedObserver~ toolChangedObservers
+        -Tools activeTool
+        +addController(Tools, Controller)
+        +setActiveTool(Tools)
+        +getActiveTool() Tools
+        +getActiveController() Controller
+        +getController(Tools) Controller
+        +addToolChangedObserver(ToolChangedObserver)
+        -notifyToolChangedObservers(Tools)
+    }
+
+    class PenController {
+        -Stroke currentStroke
+        -DrewPool strokePool
+        -Viewport viewport
+        -BrushContext context
+        +PenController(DrewPool, Viewport)
+        +setContext(BrushContext)
+        +setViewport(Viewport)
+        +setStrokePool(DrewPool)
+    }
+
+    class EraserController {
+        -DrewPool itemPool
+        -Eraser eraser
+        -List~Drawable~ contextItems
+        -Viewport viewport
+        +EraserController(Eraser, DrewPool, Viewport)
+        +setItemPool(DrewPool)
+        +setViewport(Viewport)
+        -checkExactCollision(Erasable, double, double, double) boolean
+    }
+
+    class PanController {
+        -Viewport viewport
+        +PanController(Viewport)
+    }
+
+    class SelectController {
+        -DrewPool itemPool
+        -Viewport viewport
+        -List~Selectable~ selectedItems
+        -List~Selectable~ contextItems
+        -RectangleBBox selectionBox
+        -boolean isMovingSelectedItems
+        -double selectStartX
+        -double selectStartY
+        -double lastMouseX
+        -double lastMouseY
+        +SelectController(DrewPool, Viewport)
+        +getSelectionBox() RectangleBBox
+        +getSelectedItems() List~Selectable~
+        +clearSelection()
+        -initializeSelectionContext()
+        -updateSelectionBox()
+        -checkPreviouslySelected() boolean
+        -onMovingMouseDragged(double, double)
+        -onSelectionMouseDragged()
+    }
+
+    class Tools {
+        <<enumeration>>
+        PEN
+        ERASER
+        SHAPE
+        SELECTION
+        TEXT
+        COLOR_PICKER
+        ZOOM
+        HAND
+        DEFAULT_TOOL$ Tools
+        +toString() String
+    }
+
+    class ToolsControllerBuilder {
+        +buildStandardToolset(DrewPool, Eraser, Viewport, ContextSetting)$ ToolsController
+    }
+
+    Controller <|-- ToolsController
+    Controller <|-- PenController
+    Controller <|-- EraserController
+    Controller <|-- PanController
+    Controller <|-- SelectController
+
+    ToolsController o-- Controller : dispatches to active
+    ToolsController o-- ToolChangedObserver
+    ToolsController --> Tools
+
+    PenController o-- DrewPool
+    PenController o-- Viewport
+    PenController ..> Stroke : creates
+
+    EraserController o-- Eraser
+    EraserController o-- DrewPool
+    EraserController o-- Viewport
+
+    PanController o-- Viewport
+
+    SelectController o-- DrewPool
+    SelectController o-- Viewport
+    SelectController *-- RectangleBBox
+
+    ToolsControllerBuilder ..> ToolsController : builds
+    ToolsControllerBuilder ..> PenController : creates
+    ToolsControllerBuilder ..> EraserController : creates
+    ToolsControllerBuilder ..> PanController : creates
+    ToolsControllerBuilder ..> SelectController : creates
+
+    %% ─────────────────────────────────────────────────────────────────────
+    %% VIEW
+    %% ─────────────────────────────────────────────────────────────────────
+    class BoardRenderer {
+        -GraphicsContext gc
+        -Viewport viewport
+        -ContextSetting contextSetting
+        +BoardRenderer()
+        +BoardRenderer(GraphicsContext)
+        +setGraphicsContext(GraphicsContext)
+        +setViewport(Viewport)
+        +setContextSetting(ContextSetting)
+        +render(DrewPool)
+        +render(Eraser)
+        +renderSelectionBox(RectangleBBox)
+        +renderSelectedItemHighlight(List~Selectable~)
+        +visit(Stroke)
+        +visit(Eraser)
+    }
+
+    class ToolBarBuilder {
+        +buildToolBar(ToolsController, DrewPool, Runnable)$ HBox
+    }
+
+    BoardRenderer ..|> RendererVisitor
+    BoardRenderer o-- Viewport
+    BoardRenderer o-- ContextSetting
+    BoardRenderer --> DrewPool : iterates
+
+    ToolBarBuilder --> ToolsController : setActiveTool
+    ToolBarBuilder --> DrewPool : undo/redo/clear + addObserver
+
+    %% ─────────────────────────────────────────────────────────────────────
+    %% SESSION WIRING
+    %% ─────────────────────────────────────────────────────────────────────
     WhiteboardSession *-- DrewPool
     WhiteboardSession *-- Viewport
     WhiteboardSession *-- Eraser
     WhiteboardSession *-- ToolsController
     WhiteboardSession *-- BoardRenderer
-
-    class MainApp {
-        +void start(Stage)
-        +void main(String[])$
-    }
-    MainApp ..> WhiteboardSession
+    WhiteboardSession --> SelectController : queries for rendering
+    WhiteboardSession --> ToolBarBuilder : calls buildToolBar
 ```

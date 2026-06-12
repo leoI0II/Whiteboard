@@ -1,5 +1,6 @@
 package org.view.jfx;
 
+import org.Controller.SelectController;
 import org.Controller.Tools;
 import org.Controller.ToolsController;
 import org.model.DrewPool;
@@ -41,6 +42,12 @@ public class ToolBarBuilder {
         pool.addObserver((canUndo, canRedo) -> {
             undoButton.setDisable(!canUndo);
             redoButton.setDisable(!canRedo);
+        });
+        pool.addObserver((canUndo, canRedo) -> {
+            var selectionController = (SelectController)mainController.getController(Tools.SELECTION);
+            if (selectionController != null) {
+                selectionController.clearSelection();
+            }
         });
         Button clearButton = new Button("Clear");
         clearButton.setOnAction(e -> {
